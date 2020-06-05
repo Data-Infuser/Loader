@@ -1,0 +1,13 @@
+.DS_Store
+
+.idea/
+.vscode/
+node_modules/
+build/
+tmp/
+temp/
+upload/*
+
+ormconfig.json
+package-lock.json
+property.json
