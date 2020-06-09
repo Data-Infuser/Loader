@@ -4,6 +4,8 @@ import methodOverride from "method-override";
 import morgan from "morgan";
 import {createConnection} from "typeorm";
 
+import { scheduler } from "./lib/scheduler";
+import { dataLoader } from "./lib/data-loader";
 import ApplicationError from "./ApplicationError";
 
 export class Application {
@@ -34,18 +36,13 @@ export class Application {
         next(err);
       });
 
-      this.startServer();
 
-      // (async () => {
-      //   var i = 0;
-      //   while(true) {
-      //     await (() => {
-      //       return new Promise(resolve => setTimeout(resolve, 1000))
-      //     }) ()
-      //     i++;
-      //     console.log(i);
-      //   }
-      // }) ();
+      await scheduler.initialize();
+
+      dataLoader.initialize(1);
+      dataLoader.start();
+
+      this.startServer();
   }
 
   startServer(): Promise<boolean> {
