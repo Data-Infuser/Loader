@@ -13,7 +13,7 @@ export enum ApplicationStatus {
 
 @Entity()
 @Unique("application_namespace_unique", ["nameSpace"])
-export class Application {
+export class Application extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
