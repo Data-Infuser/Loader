@@ -3,7 +3,7 @@ import { getRepository } from 'typeorm';
 import { jobQueue, ScheduledJob } from "../job-queue";
 
 
-enum LoaderStatus {
+enum ManagerStatus {
     Stopped,
     Running,
     Stopping
@@ -15,13 +15,13 @@ enum WorkerStatus {
 }
 
 
-class DataLoader {
+class WorkerManager {
     workers: Array<Worker>;
-    status: LoaderStatus;
+    status: ManagerStatus;
 
     constructor() {
         this.workers = new Array<Worker>();
-        this.status = LoaderStatus.Stopped;
+        this.status = ManagerStatus.Stopped;
     }
 
     public initialize(numOfWorker: number): void {
@@ -32,12 +32,12 @@ class DataLoader {
 
     public start(): void {
         var self = this;
-        this.status = LoaderStatus.Running;
+        this.status = ManagerStatus.Running;
 
         (async () => {
             while(true) {
-                if (this.status == LoaderStatus.Stopping) {
-                    this.status = LoaderStatus.Stopped;
+                if (this.status == ManagerStatus.Stopping) {
+                    this.status = ManagerStatus.Stopped;
                     break;
                 }
 
@@ -67,7 +67,7 @@ class DataLoader {
     }
 
     public stop() {
-        this.status = LoaderStatus.Stopping;
+        this.status = ManagerStatus.Stopping;
     }
 }
 
@@ -93,4 +93,4 @@ class Worker {
     }
 }
 
-export const dataLoader = new DataLoader();
+export const manager = new WorkerManager();

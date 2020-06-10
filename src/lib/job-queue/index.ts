@@ -1,8 +1,4 @@
-import { getRepository } from "typeorm";
-import cron from "node-cron";
-
-import { Service, ServiceStatus } from '../../entity/manager/Service';
-import { Application, ApplicationStatus } from '../../entity/manager/Application';
+import { Service } from '../../entity/manager/Service';
 
 class JobQueue {
     queue: Array<ScheduledJob>;

@@ -5,7 +5,7 @@ import morgan from "morgan";
 import {createConnection} from "typeorm";
 
 import { scheduler } from "./lib/scheduler";
-import { dataLoader } from "./lib/data-loader";
+import { manager } from "./lib/work-manager";
 import ApplicationError from "./ApplicationError";
 
 export class Application {
@@ -39,8 +39,8 @@ export class Application {
 
       await scheduler.initialize();
 
-      dataLoader.initialize(1);
-      dataLoader.start();
+      manager.initialize(1);
+      manager.start();
 
       this.startServer();
   }
