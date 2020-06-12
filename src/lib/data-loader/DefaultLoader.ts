@@ -161,16 +161,6 @@ export default abstract class DefaultLoader {
         return false;
     }
 
-    private convertInsertData(data: Map<string, any>): string {
-        let results = [];
-
-        this.columns.forEach(col => {
-            let raw = data.get(col);
-
-        });
-
-    }
-
     protected seperateColumn(colType: string): any[2] {
         const splitted = colType.split("(");
         const typeNm = splitted[0];
