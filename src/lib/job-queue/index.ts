@@ -33,8 +33,10 @@ class JobQueue {
 
 export class ScheduledJob {
     service: Service;
+    queuedAt: Date;
 
     constructor(service: Service) {
+        this.queuedAt = new Date();
         this.service = service;
     }
 }

@@ -1,6 +1,5 @@
-import { getRepository } from 'typeorm';
-
 import { jobQueue, ScheduledJob } from "../job-queue";
+import {createLoader} from "../data-loader";
 
 
 enum ManagerStatus {
@@ -87,7 +86,8 @@ class Worker {
         this.status = WorkerStatus.Running;
         this.job = job;
 
-        // To-Do data load 작업 작성
+        const loader = await createLoader(this.job.service);
+        await loader.import();
 
         this.status = WorkerStatus.Waiting;
     }

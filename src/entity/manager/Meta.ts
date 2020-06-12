@@ -4,6 +4,10 @@ import { MetaColumn } from "./MetaColumn";
 import { Service } from "./Service";
 
 
+export enum DbType {
+  MYSQL = "mysql",
+  POSTGRES = "postgres"
+}
 
 @Entity()
 export class Meta {
@@ -28,6 +32,15 @@ export class Meta {
   @Column({nullable: true})
   @Length(1, 20)
   extension: string;
+
+  @Column({
+    nullable: true,
+    type: "enum",
+    enum: DbType,
+    default: DbType.MYSQL
+  })
+  @Length(1, 20)
+  dbType: DbType;
 
   @Column({nullable: true})
   host: string;

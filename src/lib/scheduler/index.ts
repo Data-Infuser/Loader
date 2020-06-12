@@ -55,7 +55,7 @@ class Scheduler {
             s.destroy();
         }
 
-        const task = cron.schedule("* * * * * *", () => {
+        const task = cron.schedule("0 0 * * * *", () => {
             let job = new ScheduledJob(service);
             jobQueue.enqueue(job);
         }, {

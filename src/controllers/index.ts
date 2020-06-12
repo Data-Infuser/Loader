@@ -1,6 +1,7 @@
-import DefaultController from "./DefaultController";
 import ScheduleController from "./ScheduleController";
+import ConnectionInfoController from "./DbInfoController";
 
 export default [
-    new ScheduleController()
+    new ScheduleController(),
+    new ConnectionInfoController()
 ]
