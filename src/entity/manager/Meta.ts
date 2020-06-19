@@ -4,8 +4,10 @@ import { MetaColumn } from "./MetaColumn";
 import { Service } from "./Service";
 
 
-export enum DbType {
+export enum AcceptableDbms {
   MYSQL = "mysql",
+  ORACLE = "oracle",
+  MARIADB = "mariadb",
   POSTGRES = "postgres"
 }
 
@@ -34,13 +36,11 @@ export class Meta {
   extension: string;
 
   @Column({
-    nullable: true,
     type: "enum",
-    enum: DbType,
-    default: DbType.MYSQL
+    enum: AcceptableDbms,
+    default: AcceptableDbms.MYSQL
   })
-  @Length(1, 20)
-  dbType: DbType;
+  dbms: AcceptableDbms;
 
   @Column({nullable: true})
   host: string;

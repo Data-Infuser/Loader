@@ -48,8 +48,8 @@ export class Application extends BaseEntity {
   updatedAt: Date;
 
   get isDeployable(): boolean {
-    if(this.apis.length == 0) return false;
-    this.apis.forEach(api => {
+    if(this.services.length == 0) return false;
+    this.services.forEach(api => {
       if(api.status == ServiceStatus.METALOADED) return false
     });
     return true; 

@@ -101,8 +101,8 @@ export default abstract class DefaultLoader {
     protected async connect(): Promise<boolean> {
         try {
             const options: ConnectionOptions = {
-                name: `${this.meta.dbType}/${this.meta.dbUser}:${this.meta.pwd}@${this.meta.host}:${this.meta.port}/`,
-                type: this.meta.dbType,
+                name: `${this.meta.dbms}/${this.meta.dbUser}:${this.meta.pwd}@${this.meta.host}:${this.meta.port}/`,
+                type: this.meta.dbms,
                 host: this.meta.host,
                 port: Number(this.meta.port),
                 username: this.meta.dbUser,

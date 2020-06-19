@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm';
 import { Service } from './../../entity/manager/Service';
 import MysqlLoader from "./MysqlLoader"
 import DefaultLoader from "./DefaultLoader"
-import { DbType } from "../../entity/manager/Meta";
+import { AcceptableDbms } from "../../entity/manager/Meta";
 
 export async function createLoader(service: Service): Promise<DefaultLoader> {
     let instance: DefaultLoader;
@@ -15,7 +15,7 @@ export async function createLoader(service: Service): Promise<DefaultLoader> {
             where: { id: service.id }
         });
     }
-    instance = createLoaderExceptService(service.meta.dbType, service);
+    instance = createLoaderExceptService(service.meta.dbms, service);
 
     return instance;
 }
@@ -24,7 +24,7 @@ export function createLoaderExceptService(dbms: string, service: Service): Defau
     let instance: DefaultLoader;
 
     switch (dbms) {
-        case DbType.MYSQL: {
+        case AcceptableDbms.MYSQL: {
             instance = new MysqlLoader(service);
         }
     }
