@@ -103,6 +103,10 @@ export default abstract class DefaultLoader {
         return true;
     }
 
+    public async close() {
+        await this.manager.connection.close();
+    }
+
     protected async connect(): Promise<boolean> {
         try {
             const options: ConnectionOptions = {
@@ -124,10 +128,6 @@ export default abstract class DefaultLoader {
             return false;
         }
         return true;
-    }
-
-    private async close() {
-        await this.manager.connection.close();
     }
 
     private convertColumns(columns: ColumnDescribe[]): TableColumnOptions[] {

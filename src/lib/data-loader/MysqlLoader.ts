@@ -7,6 +7,10 @@ export default class MysqlLoader extends DefaultLoader {
         super(service);
     }
 
+    public async closeConnection() {
+        await this.close();
+    }
+
     public async getTables(): Promise<Array<string>> {
         if (this.getManager() == undefined) await this.connect();
         
@@ -21,7 +25,6 @@ export default class MysqlLoader extends DefaultLoader {
 
             tables.push(table);
         }
-
         return tables;
     }
 
@@ -42,7 +45,6 @@ export default class MysqlLoader extends DefaultLoader {
 
             columns.push(desc);
         });
-
         return columns;
     }
     

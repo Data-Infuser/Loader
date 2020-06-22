@@ -22,10 +22,10 @@ export default class DbInfoController {
         try {
             const loader = await this.getManager(req);
             const tables: Array<string> = await loader.getTables();
-
+            await loader.close();
             res.json(tables);
         } catch(err) {
-            console.log(err);
+            console.error(err);
             res.status(500).json(err.message);
         }
     }
@@ -36,10 +36,10 @@ export default class DbInfoController {
         try {
             const loader = await this.getManager(req);
             const columns: Array<ColumnDescribe> = await loader.getColumns(tableNm);
-
+            await loader.close();
             res.json(columns);
         } catch(err) {
-            console.log(err);
+            console.error(err);
             res.status(500).json(err.message);
         }
     }
