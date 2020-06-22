@@ -87,11 +87,17 @@ export default abstract class DefaultLoader {
     }
 
     public async connectExceptSevice(options: ConnectionOptions): Promise<boolean> {
+        console.log(options);
         try {
+            let connections;
             try {
-                getConnection(options.name);
+                const connection = getConnection(options.name);
+                if(!connection.isConnected) {
+                    await connection.connect()
+                }
             } catch (err) {
-                await createConnections([options]);
+                console.error(err);
+                connections = await createConnections([options]);
             }
             const manager = getManager(options.name);
     

@@ -7,10 +7,6 @@ export default class MysqlLoader extends DefaultLoader {
         super(service);
     }
 
-    public async closeConnection() {
-        await this.close();
-    }
-
     public async getTables(): Promise<Array<string>> {
         if (this.getManager() == undefined) await this.connect();
         
@@ -30,12 +26,9 @@ export default class MysqlLoader extends DefaultLoader {
 
     public async getColumns(table: string): Promise<Array<ColumnDescribe>> {
         if (this.getManager() == undefined) await this.connect();
-
         const manager = this.getManager();
         let columns: Array<ColumnDescribe> = new Array<ColumnDescribe>();
-
         const cols = await manager.query(`DESC ${table}`);
-
         cols.forEach((col) => {
             const desc: ColumnDescribe = {
                 name: col.Field,
