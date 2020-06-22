@@ -27,6 +27,8 @@ export function createLoaderExceptService(dbms: string, service: Service): Defau
         case AcceptableDbms.MYSQL: {
             instance = new MysqlLoader(service);
         }
+        default:
+            break;
     }
 
     return instance;

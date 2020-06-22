@@ -1,5 +1,5 @@
 import { Service } from './../../entity/manager/Service';
-import { EntityManager, createConnections, getManager, ConnectionOptions, getConnection, Table } from 'typeorm';
+import { EntityManager, createConnections, getManager, ConnectionOptions, getConnection, Table, getConnectionManager } from 'typeorm';
 import { Meta } from '../../entity/manager/Meta';
 import { ColumnDescribe } from './ColumnInfo';
 import { TableOptions } from 'typeorm/schema-builder/options/TableOptions';
@@ -88,11 +88,16 @@ export default abstract class DefaultLoader {
 
     public async connectExceptSevice(options: ConnectionOptions): Promise<boolean> {
         try {
-            await createConnections([options]);
-            const manager: EntityManager = getManager(options.name);
+            try {
+                getConnection(options.name);
+            } catch (err) {
+                await createConnections([options]);
+            }
+            const manager = getManager(options.name);
     
             this.manager = manager;
         } catch(err) {
+            console.error(err);
             return false;
         }
         return true;
@@ -115,6 +120,7 @@ export default abstract class DefaultLoader {
     
             this.manager = manager;
         } catch(err) {
+            console.error(err);
             return false;
         }
         return true;

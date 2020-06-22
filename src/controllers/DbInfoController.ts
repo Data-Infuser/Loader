@@ -19,23 +19,34 @@ export default class DbInfoController {
     }
 
     getTables = async(req: Request, res: Response)=> {
-        const loader = await this.getManager(req);
-        const tables: Array<string> = await loader.getTables();
+        try {
+            const loader = await this.getManager(req);
+            const tables: Array<string> = await loader.getTables();
 
-        res.json(tables);
+            res.json(tables);
+        } catch(err) {
+            console.log(err);
+            res.status(500).json(err.message);
+        }
     }
 
     getColumns = async(req: Request, res: Response)=> {
         const {tableNm} = req.params;
 
-        const loader = await this.getManager(req);
-        const columns: Array<ColumnDescribe> = await loader.getColumns(tableNm);
+        try {
+            const loader = await this.getManager(req);
+            const columns: Array<ColumnDescribe> = await loader.getColumns(tableNm);
 
-        res.json(columns);
+            res.json(columns);
+        } catch(err) {
+            console.log(err);
+            res.status(500).json(err.message);
+        }
     }
 
     getManager = async(req: Request) => {
         const {dbms, username, password, hostname, port, database} = req.query;
+        console.log(req.query);
         const options: ConnectionOptions = {
             name: `${dbms}/${username}:${password}@${hostname}:${port}/`,
             type: `${dbms}`,
