@@ -1,5 +1,5 @@
-# Data-Loader
-> ``Data Infuser`` / Data-Loader 프로젝트 입니다.
+# Loader
+> ``Data Infuser`` / Loader 프로젝트 입니다.
 
 Data Infuser 프로젝트에서 원천 데이터를 프로젝트 DB내에 로드하고, 원천 데이터의 Meta data를 읽는 모듈입니다.
 
