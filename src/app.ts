@@ -1,16 +1,21 @@
-import {createConnection} from "typeorm";
+import {createConnection, getRepository, getConnection} from "typeorm";
 import Bull from 'bull';
 import property from "../property.json"
+import { Application, ApplicationStatus } from "./entity/manager/Application";
+import { ServiceStatus } from "./entity/manager/Service";
+import DataLoader from './lib/data-loader/DataLoader';
+import DataLoadStrategy from "./lib/data-loader/DataLoadStrategy";
+import MysqlStrategy from "./lib/data-loader/strategies/MysqlStrategy";
 
-export class Application {
+export class Loader {
   dataLoaderQueue:Bull.Queue;
-
-  constructor(controllers: any[]) {}
+  
+  constructor() {}
 
   setupDbAndServer = async () => {
-      const conn = await createConnection().catch(error => console.log(error));
-      const datasetConn = await createConnection('dataset').catch(error => console.log(error));
-
+      await createConnection().catch(error => console.log(error));
+      await createConnection('dataset').catch(error => console.log(error));
+      
       this.dataLoaderQueue = new Bull('dataLoader', {
         redis: {
           port: property["jobqueue-redis"].port,
@@ -18,11 +23,62 @@ export class Application {
         }
       });
 
-      this.dataLoaderQueue.process(function(job, done) {
-        const data = job.data;
-        console.log(data);
-        job.progress(100);
-        done()
+      this.dataLoaderQueue.process(async function(job, done) {
+        const queryRunner = await getConnection().createQueryRunner();
+        const applicationRepo = getRepository(Application);
+        let application:Application;
+        try {
+          await queryRunner.startTransaction();
+          const data:DataLoaderJobData = job.data;
+          application = await applicationRepo.findOneOrFail({
+            relations: ["services", "services.meta", "services.meta.columns"],
+            where: {
+              id: data.id
+            }
+          });
+          job.progress(10);
+
+          // Scheduled 상태가 아닌 Application의 경우 Error
+          if(application.status != ApplicationStatus.SCHEDULED) {
+            throw new Error('Application has not set as Scheduled job! check status!')
+          }
+
+          //transaction start
+          //Scheduled 상태의 Service만 선택하여, Data Load 진행
+          for(const service of application.services) {
+            if(service.status != ServiceStatus.SCHEDULED) continue;
+            //Load Data
+            let loadStrategy: DataLoadStrategy;
+            
+            console.log(service.meta)
+            if(service.meta.dataType === 'dbms') {
+              switch(service.meta.dbms) {
+                case 'mysql':
+                  loadStrategy = new MysqlStrategy(queryRunner);
+                  break;
+                default:
+                  throw new Error("unexceptable dbms");
+              }
+            }
+            const loader = new DataLoader(loadStrategy);
+            loader.load(application, service);
+          }
+          job.progress(80);
+          // transaction end
+          await queryRunner.commitTransaction();
+          job.progress(100);
+          done()
+        } catch (err) {
+          await queryRunner.rollbackTransaction();
+          application.status = ApplicationStatus.FAILED;
+          await applicationRepo.save(application);
+          done(err);
+        }
       })
   }
+}
+
+interface DataLoaderJobData {
+  id: number,
+  userId: number
 }

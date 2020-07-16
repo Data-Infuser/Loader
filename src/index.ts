@@ -1,5 +1,3 @@
-import { Application } from './app';
-import controller from "./controllers";
+import { Loader } from './app';
 
-
-new Application(controller).setupDbAndServer();
+new Loader().setupDbAndServer();
