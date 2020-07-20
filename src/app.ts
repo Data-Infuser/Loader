@@ -6,6 +6,7 @@ import { ServiceStatus } from "./entity/manager/Service";
 import DataLoader from './lib/data-loader/DataLoader';
 import DataLoadStrategy from "./lib/data-loader/DataLoadStrategy";
 import MysqlStrategy from "./lib/data-loader/strategies/MysqlStrategy";
+import XlsxStrategy from "./lib/data-loader/strategies/XlsxStrategy";
 
 export class Loader {
   dataLoaderQueue:Bull.Queue;
@@ -50,15 +51,24 @@ export class Loader {
             //Load Data
             let loadStrategy: DataLoadStrategy;
             
-            console.log(service.meta)
             if(service.meta.dataType === 'dbms') {
               switch(service.meta.dbms) {
                 case 'mysql':
                   loadStrategy = new MysqlStrategy(queryRunner);
                   break;
                 default:
-                  throw new Error("unexceptable dbms");
+                  throw new Error("unacceptable dbms");
               }
+            } else if(service.meta.dataType === 'file') {
+              switch(service.meta.extension) {
+                case 'xlsx':
+                  loadStrategy = new XlsxStrategy(queryRunner);
+                  break;
+                default:
+                  throw new Error("unacceptable file extenseion");
+              }
+            } else {
+              throw new Error("unacceptable dataType")
             }
             const loader = new DataLoader(loadStrategy);
             loader.load(application, service);
