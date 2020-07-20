@@ -29,6 +29,7 @@ export class Loader {
         const applicationRepo = getRepository(Application);
         let application:Application;
         try {
+          job.progress(1);
           await queryRunner.startTransaction();
           const data:DataLoaderJobData = job.data;
           application = await applicationRepo.findOneOrFail({
@@ -37,12 +38,15 @@ export class Loader {
               id: data.id
             }
           });
+
           job.progress(10);
 
           // Scheduled 상태가 아닌 Application의 경우 Error
           if(application.status != ApplicationStatus.SCHEDULED) {
             throw new Error('Application has not set as Scheduled job! check status!')
           }
+
+          job.progress(20);
 
           //transaction start
           //Scheduled 상태의 Service만 선택하여, Data Load 진행
@@ -57,6 +61,7 @@ export class Loader {
                   loadStrategy = new MysqlStrategy(queryRunner);
                   break;
                 default:
+                  console.log("unacceptable dbms")
                   throw new Error("unacceptable dbms");
               }
             } else if(service.meta.dataType === 'file') {
@@ -65,25 +70,42 @@ export class Loader {
                   loadStrategy = new XlsxStrategy(queryRunner);
                   break;
                 default:
+                  console.log("unacceptable file extenseion")
                   throw new Error("unacceptable file extenseion");
               }
             } else {
+              console.log("unacceptable dataType")
               throw new Error("unacceptable dataType")
             }
+            console.log(loadStrategy);
             const loader = new DataLoader(loadStrategy);
-            loader.load(application, service);
+            await loader.load(application, service);
           }
+
           job.progress(80);
+
+          application.status = ApplicationStatus.DEPLOYED;
+          await applicationRepo.save(application)
+          job.progress(90);
           // transaction end
           await queryRunner.commitTransaction();
           job.progress(100);
           done()
         } catch (err) {
+          console.error(err);
           await queryRunner.rollbackTransaction();
           application.status = ApplicationStatus.FAILED;
           await applicationRepo.save(application);
           done(err);
         }
+      })
+
+      this.dataLoaderQueue.on("failed", async (job) => {
+        const applicationId = job.data.id;
+        const applicationRepo = getRepository(Application);
+        const application:Application = await applicationRepo.findOneOrFail(applicationId);
+        application.status = ApplicationStatus.FAILED;
+        await applicationRepo.save(application);
       })
   }
 }

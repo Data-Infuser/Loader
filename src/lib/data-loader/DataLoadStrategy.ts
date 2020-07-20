@@ -66,6 +66,7 @@ abstract class DataLoadStrategy {
         await this.defaultQueryRunner.manager.save(meta);
         await this.defaultQueryRunner.manager.save(service);
         await this.defaultQueryRunner.manager.save(serviceColumns);
+        resolve();
       } catch(err) {
         service.status = ServiceStatus.FAILED;
         await this.defaultQueryRunner.manager.save(service);

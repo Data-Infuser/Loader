@@ -25,6 +25,7 @@ class XlsxStrategy extends DataLoadStrategy {
         }
         resolve(insertValues);
       } catch (err) {
+        console.error(err);
         reject(err);
       }
     })
