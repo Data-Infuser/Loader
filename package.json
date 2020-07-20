@@ -33,6 +33,7 @@
         "exceljs": "^3.9.0",
         "express": "^4.17.1",
         "mysql": "^2.14.1",
+        "node-cubrid": "^3.0.0",
         "ts-node-dev": "^1.0.0-pre.44",
         "typeorm": "^0.2.24",
         "typescript": "^3.8.3"

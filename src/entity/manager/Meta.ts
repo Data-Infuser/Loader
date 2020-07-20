@@ -8,7 +8,8 @@ export enum AcceptableDbms {
   MYSQL = "mysql",
   ORACLE = "oracle",
   MARIADB = "mariadb",
-  POSTGRES = "postgres"
+  POSTGRES = "postgres",
+  CUBRID = "cubrid"
 }
 
 @Entity()

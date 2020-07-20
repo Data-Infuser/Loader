@@ -7,6 +7,7 @@ import DataLoader from './lib/data-loader/DataLoader';
 import DataLoadStrategy from "./lib/data-loader/DataLoadStrategy";
 import MysqlStrategy from "./lib/data-loader/strategies/MysqlStrategy";
 import XlsxStrategy from "./lib/data-loader/strategies/XlsxStrategy";
+import CubridStrategy from "./lib/data-loader/strategies/CubridStrategy";
 
 export class Loader {
   dataLoaderQueue:Bull.Queue;
@@ -59,6 +60,9 @@ export class Loader {
               switch(service.meta.dbms) {
                 case 'mysql':
                   loadStrategy = new MysqlStrategy(queryRunner);
+                  break;
+                case 'cubrid':
+                  loadStrategy = new CubridStrategy(queryRunner);
                   break;
                 default:
                   console.log("unacceptable dbms")
