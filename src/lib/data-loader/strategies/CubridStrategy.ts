@@ -13,7 +13,6 @@ class CubridStrategy extends DataLoadStrategy {
     return new Promise(async (resolve, reject) => {
       let client;
       try {
-        console.log(meta);
         const dbConfig = {
           host: meta.host,
           port: Number(meta.port),

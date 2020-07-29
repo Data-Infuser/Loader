@@ -8,6 +8,7 @@ import DataLoadStrategy from "./lib/data-loader/DataLoadStrategy";
 import MysqlStrategy from "./lib/data-loader/strategies/MysqlStrategy";
 import XlsxStrategy from "./lib/data-loader/strategies/XlsxStrategy";
 import CubridStrategy from "./lib/data-loader/strategies/CubridStrategy";
+import CsvStrategy from "./lib/data-loader/strategies/CsvStrategy";
 
 export class Loader {
   dataLoaderQueue:Bull.Queue;
@@ -73,6 +74,9 @@ export class Loader {
                 case 'xlsx':
                   loadStrategy = new XlsxStrategy(queryRunner);
                   break;
+                case 'csv':
+                  loadStrategy = new CsvStrategy(queryRunner);
+                  break;
                 default:
                   console.log("unacceptable file extenseion")
                   throw new Error("unacceptable file extenseion");
@@ -81,7 +85,6 @@ export class Loader {
               console.log("unacceptable dataType")
               throw new Error("unacceptable dataType")
             }
-            console.log(loadStrategy);
             const loader = new DataLoader(loadStrategy);
             await loader.load(application, service);
           }
