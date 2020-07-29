@@ -111,7 +111,7 @@ export class Loader {
         const applicationId = job.data.id;
         const applicationRepo = getRepository(Application);
         const application:Application = await applicationRepo.findOneOrFail(applicationId);
-        application.status = ApplicationStatus.FAILED;
+        application.status = ApplicationStatus.IDLE;
         await applicationRepo.save(application);
       })
   }

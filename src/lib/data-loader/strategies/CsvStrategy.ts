@@ -23,14 +23,6 @@ class CsvStrategy extends DataLoadStrategy {
         const records = parse(file.toString("utf-8"), {
           from_line: fromLine
         })
-        // const loadedWorkbook = await new Excel.Workbook().xlsx.readFile(meta.filePath);
-        // const worksheet = loadedWorkbook.worksheets[meta.sheet]
-        // const totalRowCount = worksheet.rowCount
-        // for(let i = meta.skip + 2; i <= totalRowCount; i++) {
-        //   let row = <string[]>worksheet.getRow(i).values
-        //   if(row.length == 0) continue;
-        //   insertValues.push(row.slice(1));
-        // }
         resolve(records);
       } catch (err) {
         console.error(err);
