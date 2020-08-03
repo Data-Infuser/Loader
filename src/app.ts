@@ -118,8 +118,23 @@ export class Loader {
         const log = new LoaderLog();
         log.application = application;
         log.content = err.stack;
+        log.message = err.message;
+        log.isFailed = true;
         await logRepo.save(log);
         await applicationRepo.save(application);
+        await job.remove();
+      })
+
+      this.dataLoaderQueue.on("completed", async (job) => {
+        const applicationId = job.data.id;
+        const applicationRepo = getRepository(Application);
+        const logRepo = getRepository(LoaderLog);
+        const application:Application = await applicationRepo.findOneOrFail(applicationId);
+
+        const log = new LoaderLog();
+        log.application = application;
+        log.isFailed = false;
+        await logRepo.save(log);
         await job.remove();
       })
   }
