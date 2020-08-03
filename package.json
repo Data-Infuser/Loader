@@ -34,6 +34,7 @@
         "exceljs": "^3.9.0",
         "express": "^4.17.1",
         "iconv-lite": "^0.6.2",
+        "jschardet": "^2.2.1",
         "mysql": "^2.14.1",
         "node-cubrid": "^3.0.0",
         "ts-node-dev": "^1.0.0-pre.44",

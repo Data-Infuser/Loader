@@ -8,6 +8,7 @@ import fs from 'fs';
 
 const parse = require('csv-parse/lib/sync')
 const iconv = require('iconv-lite');
+const jschardet = require('jschardet');
 
 class CsvStrategy extends DataLoadStrategy {
 
@@ -19,7 +20,9 @@ class CsvStrategy extends DataLoadStrategy {
     return new Promise(async(resolve, reject) => {
       try {
         const fromLine = 2 + Number(meta.skip);
-        const file = iconv.decode(fs.readFileSync(meta.filePath), 'euc-kr');
+        const encodedFile = fs.readFileSync(meta.filePath);
+        const encoding = jschardet.detect(encodedFile).encoding;
+        const file = iconv.decode(encodedFile, encoding);
         const records = parse(file.toString("utf-8"), {
           from_line: fromLine
         })
