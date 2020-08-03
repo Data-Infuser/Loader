@@ -9,6 +9,7 @@ import MysqlStrategy from "./lib/data-loader/strategies/MysqlStrategy";
 import XlsxStrategy from "./lib/data-loader/strategies/XlsxStrategy";
 import CubridStrategy from "./lib/data-loader/strategies/CubridStrategy";
 import CsvStrategy from "./lib/data-loader/strategies/CsvStrategy";
+import { LoaderLog } from "./entity/manager/LoaderLog";
 
 export class Loader {
   dataLoaderQueue:Bull.Queue;
@@ -107,12 +108,19 @@ export class Loader {
         }
       })
 
-      this.dataLoaderQueue.on("failed", async (job) => {
+      this.dataLoaderQueue.on("failed", async (job, err) => {
         const applicationId = job.data.id;
         const applicationRepo = getRepository(Application);
+        const logRepo = getRepository(LoaderLog);
         const application:Application = await applicationRepo.findOneOrFail(applicationId);
         application.status = ApplicationStatus.IDLE;
+
+        const log = new LoaderLog();
+        log.application = application;
+        log.content = err.stack;
+        await logRepo.save(log);
         await applicationRepo.save(application);
+        await job.remove();
       })
   }
 }
