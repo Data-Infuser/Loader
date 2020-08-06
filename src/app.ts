@@ -10,6 +10,7 @@ import XlsxStrategy from "./lib/data-loader/strategies/XlsxStrategy";
 import CubridStrategy from "./lib/data-loader/strategies/CubridStrategy";
 import CsvStrategy from "./lib/data-loader/strategies/CsvStrategy";
 import { LoaderLog } from "./entity/manager/LoaderLog";
+import ormConfig from "./config/ormConfig";
 
 export class Loader {
   dataLoaderQueue:Bull.Queue;
@@ -17,9 +18,9 @@ export class Loader {
   constructor() {}
 
   setupDbAndServer = async () => {
-      await createConnection().catch(error => console.log(error));
-      await createConnection('dataset').catch(error => console.log(error));
-      
+      await createConnection(ormConfig.defaultConnection).catch(error => console.log(error));
+      await createConnection(ormConfig.datasetConnection).catch(error => console.log(error));
+      console.log("Server starts");
       this.dataLoaderQueue = new Bull('dataLoader', {
         redis: {
           port: property["jobqueue-redis"].port,

@@ -1,9 +1,10 @@
 import DataLoadStrategy from "../DataLoadStrategy";
-import * as Excel from 'exceljs';
 import { Service } from "../../../entity/manager/Service";
 import { Application } from "../../../entity/manager/Application";
 import { Meta } from "../../../entity/manager/Meta";
 import { QueryRunner } from "typeorm";
+
+const Excel = require("exceljs");
 
 class XlsxStrategy extends DataLoadStrategy {
 

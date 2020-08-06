@@ -1,22 +1,33 @@
 {
-    "compilerOptions": {
-       "lib": [
-          "es5",
-          "es6"
-       ],
-       "target": "es5",
-       "module": "commonjs",
-       "moduleResolution": "node",
-       "outDir": "./build",
-       "emitDecoratorMetadata": true,
-       "experimentalDecorators": true,
-       "sourceMap": true,
-       "esModuleInterop": true,
-       "resolveJsonModule": true
-    },
-    "typeRoots": [
-       "./@types",
-       "./node_modules/@types",
-       "./src/@types"
-    ]
- }
+   "compilerOptions": {
+      "lib": [
+         "es6"
+      ],
+      "target": "es6",
+      "module": "commonjs",
+      "outDir": "./build",
+      "moduleResolution": "node",
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "sourceMap": true,
+      "esModuleInterop": true,
+      "resolveJsonModule": true,
+      "composite": true,
+      "types": ["node"],
+      "allowJs": false
+   },
+   "typeRoots": [
+      "./@types",
+      "./node_modules/@types",
+      "./src/@types"
+   ],
+   "exclude": [
+      "./test"
+   ],
+   "include": [ 
+      "src/**/*",
+      "src/**/*.json",
+      "property.json",
+      "ormconfig.json"
+   ]
+}
