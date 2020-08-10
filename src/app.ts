@@ -1,8 +1,8 @@
-import {createConnection, getRepository, getConnection} from "typeorm";
+import {createConnection, getRepository, getConnection, getManager} from "typeorm";
 import Bull from 'bull';
 import property from "../property.json"
 import { Application, ApplicationStatus } from "./entity/manager/Application";
-import { ServiceStatus } from "./entity/manager/Service";
+import { ServiceStatus, Service } from "./entity/manager/Service";
 import DataLoader from './lib/data-loader/DataLoader';
 import DataLoadStrategy from "./lib/data-loader/DataLoadStrategy";
 import MysqlStrategy from "./lib/data-loader/strategies/MysqlStrategy";
@@ -11,9 +11,13 @@ import CubridStrategy from "./lib/data-loader/strategies/CubridStrategy";
 import CsvStrategy from "./lib/data-loader/strategies/CsvStrategy";
 import { LoaderLog } from "./entity/manager/LoaderLog";
 import ormConfig from "./config/ormConfig";
+import axios from "axios";
+import Axios from "axios";
+import { createWriteStream } from "fs";
 
 export class Loader {
   dataLoaderQueue:Bull.Queue;
+  metaLoaderQueue: Bull.Queue;
   
   constructor() {}
 
@@ -27,6 +31,13 @@ export class Loader {
           host: property["jobqueue-redis"].host
         }
       });
+
+      this.metaLoaderQueue = new Bull('metaLoader', {
+        redis: {
+          port: property["jobqueue-redis"].port,
+          host: property["jobqueue-redis"].host
+        }
+      })
 
       this.dataLoaderQueue.process(async function(job, done) {
         const queryRunner = await getConnection().createQueryRunner();
@@ -138,6 +149,54 @@ export class Loader {
         await logRepo.save(log);
         await job.remove();
       })
+
+      this.metaLoaderQueue.process(async function(job, done) {
+        const serviceRepo = getRepository(Service);
+        const service = await serviceRepo.findOneOrFail({
+          relations: ["meta"],
+          where: {
+            id: job.data.serviceId
+          }
+        });
+
+        if(service.status !== ServiceStatus.METASCHEDULED) {
+          const err = new Error("It's not a MetaScheduled Status");
+          done(err)
+          return;
+        }
+
+        const url = job.data.url;
+        const fileName = job.data.fileName;
+        const filePath = property["upload-dist"].localPath + "/" + fileName
+        const writer = createWriteStream(filePath);
+        Axios({
+          method: "get",
+          url: url,
+          responseType: 'stream'
+        }).then(
+          response => {
+            response.data.pipe(writer);
+            let error = null;
+            writer.on('error', err => {
+              error = err;
+              writer.close();
+              done(err);
+            });
+            writer.on('close', async () => {
+              if (!error) {
+                service.status = ServiceStatus.METADOWNLOADED;
+                service.meta.filePath = filePath;
+                service.meta.originalFileName = fileName;
+                await getManager().transaction("SERIALIZABLE", async transactionalEntityManager => {
+                  await transactionalEntityManager.save(service);
+                  await transactionalEntityManager.save(service.meta);
+                });
+                done();
+              }
+            });
+          }
+        )
+      });
   }
 }
 
