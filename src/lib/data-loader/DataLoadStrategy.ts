@@ -5,6 +5,7 @@ import { QueryRunner } from 'typeorm/query-runner/QueryRunner';
 import { getConnection, Table } from 'typeorm';
 import { ServiceColumn } from '../../entity/manager/ServiceColumn';
 import { TableOptions } from 'typeorm/schema-builder/options/TableOptions';
+import { Stage } from '../../entity/manager/Stage';
 
 abstract class DataLoadStrategy {
   tablesForDelete: string[];
@@ -15,14 +16,14 @@ abstract class DataLoadStrategy {
     this.defaultQueryRunner = defaultQueryRunner;
   }
   
-  async load(application: Application,service:Service) {
+  async load(stage: Stage,service:Service) {
     const datasetQueryRunner = await getConnection('dataset').createQueryRunner();
     return new Promise(async (resolve, reject) => {
       try {
-        service.application = application;
+        service.stage = stage;
         const meta = service.meta;  
         const metaColumns = meta.columns;
-        service.tableName = service.application.nameSpace + "-" + service.entityName
+        service.tableName = `${stage.application.id}-${stage.id}-${service.id}`
         // column data 생성
         let columns = []
         let columnNames = []
@@ -56,8 +57,6 @@ abstract class DataLoadStrategy {
          */
         let insertValues = await this.generateRows(meta, originalColumnNames);
         this.tablesForDelete.push(tableOption.name);
-        service.columnLength = serviceColumns.length;
-        service.dataCounts = insertValues.length;
         await datasetQueryRunner.dropTable(service.tableName, true);
         await datasetQueryRunner.createTable(new Table(tableOption));
         await datasetQueryRunner.query(insertQuery, [insertValues]);

@@ -8,18 +8,19 @@ import XlsxStrategy from "./lib/data-loader/strategies/XlsxStrategy";
 import CsvStrategy from "./lib/data-loader/strategies/CsvStrategy";
 import DataLoader from "./lib/data-loader/DataLoader";
 import { LoaderLog } from "./entity/manager/LoaderLog";
+import { Stage, StageStatus } from "./entity/manager/Stage";
 
 class DataLoaderController {
   static async loadData(job, done) {
     const queryRunner = await getConnection().createQueryRunner();
-    const applicationRepo = getRepository(Application);
-    let application:Application;
+    const stageRepo = getRepository(Stage);
+    let stage:Stage;
     try {
       job.progress(1);
       await queryRunner.startTransaction();
       const data:DataLoaderJobData = job.data;
-      application = await applicationRepo.findOneOrFail({
-        relations: ["services", "services.meta", "services.meta.columns"],
+      stage = await stageRepo.findOneOrFail({
+        relations: ["application", "services", "services.meta", "services.meta.columns"],
         where: {
           id: data.id
         }
@@ -28,7 +29,7 @@ class DataLoaderController {
       job.progress(10);
 
       // Scheduled 상태가 아닌 Application의 경우 Error
-      if(application.status != ApplicationStatus.SCHEDULED) {
+      if(stage.status != StageStatus.SCHEDULED) {
         throw new Error('Application has not set as Scheduled job! check status!')
       }
 
@@ -36,7 +37,7 @@ class DataLoaderController {
 
       //transaction start
       //Scheduled 상태의 Service만 선택하여, Data Load 진행
-      for(const service of application.services) {
+      for(const service of stage.services) {
         if(service.status != ServiceStatus.SCHEDULED) continue;
         //Load Data
         let loadStrategy: DataLoadStrategy;
@@ -53,7 +54,7 @@ class DataLoaderController {
               console.log("unacceptable dbms")
               throw new Error("unacceptable dbms");
           }
-        } else if(service.meta.dataType === 'file') {
+        } else if(service.meta.dataType === 'file' || service.meta.dataType === 'file-url') {
           switch(service.meta.extension) {
             case 'xlsx':
               loadStrategy = new XlsxStrategy(queryRunner);
@@ -70,13 +71,13 @@ class DataLoaderController {
           throw new Error("unacceptable dataType")
         }
         const loader = new DataLoader(loadStrategy);
-        await loader.load(application, service);
+        await loader.load(stage, service);
       }
 
       job.progress(80);
 
-      application.status = ApplicationStatus.DEPLOYED;
-      await applicationRepo.save(application)
+      stage.status = StageStatus.LOADED;
+      await stageRepo.save(stage)
       job.progress(90);
       // transaction end
       await queryRunner.commitTransaction();
@@ -85,37 +86,39 @@ class DataLoaderController {
     } catch (err) {
       console.error(err);
       await queryRunner.rollbackTransaction();
-      application.status = ApplicationStatus.FAILED;
-      await applicationRepo.save(application);
+      if(stage) {
+        stage.status = StageStatus.FAILED;
+        await stageRepo.save(stage);
+      }
       done(err);
     }
   }
 
   static async handleFailed(job, err) {
-    const applicationId = job.data.id;
-    const applicationRepo = getRepository(Application);
+    const stageId = job.data.id;
+    const stageRepo = getRepository(Stage);
     const logRepo = getRepository(LoaderLog);
-    const application:Application = await applicationRepo.findOneOrFail(applicationId);
-    application.status = ApplicationStatus.IDLE;
+    const stage:Stage = await stageRepo.findOneOrFail(stageId);
+    stage.status = StageStatus.FAILED;
 
     const log = new LoaderLog();
-    log.application = application;
+    log.stage = stage;
     log.content = err.stack;
     log.message = err.message;
     log.isFailed = true;
     await logRepo.save(log);
-    await applicationRepo.save(application);
+    await stageRepo.save(stage);
     await job.remove();
   }
 
   static async handleCompleted(job) {
-    const applicationId = job.data.id;
-    const applicationRepo = getRepository(Application);
+    const stageId = job.data.id;
+    const stageRepo = getRepository(Stage);
     const logRepo = getRepository(LoaderLog);
-    const application:Application = await applicationRepo.findOneOrFail(applicationId);
+    const stage:Stage = await stageRepo.findOneOrFail(stageId);
 
     const log = new LoaderLog();
-    log.application = application;
+    log.stage = stage;
     log.isFailed = false;
     await logRepo.save(log);
     await job.remove();

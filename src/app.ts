@@ -1,19 +1,7 @@
-import {createConnection, getRepository, getConnection, getManager} from "typeorm";
+import {createConnection} from "typeorm";
 import Bull from 'bull';
 import property from "../property.json"
-import { Application, ApplicationStatus } from "./entity/manager/Application";
-import { ServiceStatus, Service } from "./entity/manager/Service";
-import DataLoader from './lib/data-loader/DataLoader';
-import DataLoadStrategy from "./lib/data-loader/DataLoadStrategy";
-import MysqlStrategy from "./lib/data-loader/strategies/MysqlStrategy";
-import XlsxStrategy from "./lib/data-loader/strategies/XlsxStrategy";
-import CubridStrategy from "./lib/data-loader/strategies/CubridStrategy";
-import CsvStrategy from "./lib/data-loader/strategies/CsvStrategy";
-import { LoaderLog } from "./entity/manager/LoaderLog";
 import ormConfig from "./config/ormConfig";
-import axios from "axios";
-import Axios from "axios";
-import { createWriteStream } from "fs";
 import DataLoaderController from './DataLoaderController';
 import MetaLoaderController from './MetaLoaderController';
 
