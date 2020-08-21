@@ -1,5 +1,4 @@
 import { getConnection, getRepository } from "typeorm";
-import { Application, ApplicationStatus } from "./entity/manager/Application";
 import { ServiceStatus } from "./entity/manager/Service";
 import DataLoadStrategy from "./lib/data-loader/DataLoadStrategy";
 import MysqlStrategy from "./lib/data-loader/strategies/MysqlStrategy";
