@@ -2,11 +2,12 @@ import DataLoadStrategy from "../DataLoadStrategy";
 import { Meta } from "../../../entity/manager/Meta";
 import { QueryRunner } from "typeorm";
 import fs from 'fs';
+import readline from 'readline';
 
 const parse = require('csv-parse/lib/sync')
 const iconv = require('iconv-lite');
-const jschardet = require('jschardet');
 
+const MAX_CHUNK_SIZE = 10;
 class CsvStrategy extends DataLoadStrategy {
 
   constructor(defaultQueryRunner: QueryRunner) {
@@ -16,14 +17,39 @@ class CsvStrategy extends DataLoadStrategy {
   async generateRows(meta:Meta, originalColumnNames:string[]): Promise<any[]> {
     return new Promise(async(resolve, reject) => {
       try {
-        const fromLine = 2 + Number(meta.skip);
-        const encodedFile = fs.readFileSync(meta.filePath);
-        const encoding = jschardet.detect(encodedFile).encoding;
-        const file = iconv.decode(encodedFile, encoding);
-        const records = parse(file.toString("utf-8"), {
-          from_line: fromLine
+        const fileStream = fs.createReadStream(meta.filePath);
+
+        const rl = readline.createInterface({
+          input: fileStream.pipe(iconv.decodeStream(meta.encoding))
         })
-        resolve(records);
+        
+        let chunks = []
+        let lineCount = 0;
+
+        let skip = meta.skip + 1;
+        let isFirst = true;
+        rl
+        .on('error', err => {
+          rl.close();
+          reject(err);
+        })
+        .on('line', line => {
+          rl.pause();
+          if(isFirst && lineCount < skip) {
+            lineCount++;
+            if(lineCount === skip - 1) isFirst = false;
+            rl.resume();
+            return;
+          }
+          chunks.push(line);
+          rl.resume();
+        })
+        .on('close', () => {
+          const csvString = chunks.join('\n');
+          const records = parse(csvString);
+          resolve(records);
+        })
+
       } catch (err) {
         console.error(err);
         reject(err);

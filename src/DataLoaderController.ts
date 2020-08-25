@@ -107,7 +107,7 @@ class DataLoaderController {
     log.isFailed = true;
     await logRepo.save(log);
     await stageRepo.save(stage);
-    await job.remove();
+    //await job.remove();
   }
 
   static async handleCompleted(job) {
@@ -120,7 +120,7 @@ class DataLoaderController {
     log.stage = stage;
     log.isFailed = false;
     await logRepo.save(log);
-    await job.remove();
+    //await job.remove();
   }
 }
 

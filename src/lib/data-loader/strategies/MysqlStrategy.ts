@@ -23,7 +23,7 @@ class MysqlStrategy extends DataLoadStrategy {
         }])
 
         const manager = await getManager('connectionForMeta');
-
+        
         let results = await manager.query(`SELECT ${originalColumnNames.join(",")} FROM \`${meta.table}\`;`);
 
         results.forEach(row => {
