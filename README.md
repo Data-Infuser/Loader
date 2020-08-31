@@ -24,6 +24,16 @@ Scheduled Queue를 기반으로 작업을 처리합니다.
 
 ts-node-dev를 이용하여 실행하기 때문에 코드 수정 후 저장을 하는 경우 자동으로 재시작됩니다.
 
+## DEPLOY
+
+> cp property-sample.json property-stage
+
+스테이지용 property 파일 생성 후 값 설정
+
+> npm run deploy-stage
+
+* Stage 서버 접근 권한이 필요합니다.
+
 ## Meta
 
 Promptechnology - [@Homepage](http://www.promptech.co.kr/) - [promptech@promptech.co.kr](promptech@promptech.co.kr)

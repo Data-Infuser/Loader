@@ -6,7 +6,8 @@
     "scripts": {
         "test": "mocha -r ts-node/register ./test/*.test.ts",
         "start": "set debug=* && ts-node-dev --ignore-watch node_modules --respawn --transpileOnly ./src/index.ts",
-        "build": "tsc -p ."
+        "build": "tsc -p .",
+        "deploy-stage": "scp property-stage.json ubuntu@13.125.199.14:/home/ubuntu/loader/property.json && ssh ubuntu@13.125.199.14 'cd loader && git pull' && ssh ubuntu@13.125.199.14 'cd loader && make stage'"
     },
     "repository": {
         "type": "git",
