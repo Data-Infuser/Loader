@@ -12,20 +12,32 @@ export class Loader {
   constructor() {}
 
   setupDbAndServer = async () => {
-      await createConnection(ormConfig.defaultConnection).catch(error => console.log(error));
-      await createConnection(ormConfig.datasetConnection).catch(error => console.log(error));
+      const defaultConnection = {
+        ...ormConfig.defaultConnection
+      }
+      const datasetConnection = {
+        ...ormConfig.datasetConnection
+      }
+      let redisHost = property["jobqueue-redis"].host
+      if(process.env.NODE_ENV !== 'production') {
+        redisHost = "localhost"
+        defaultConnection.database ="designer-test"
+      }
+      await createConnection(defaultConnection).catch(error => console.log(error));
+      await createConnection(datasetConnection).catch(error => console.log(error));
       console.log("Server starts");
+      
       this.dataLoaderQueue = new Bull('dataLoader', {
         redis: {
           port: property["jobqueue-redis"].port,
-          host: property["jobqueue-redis"].host
+          host: redisHost
         }
       });
 
       this.metaLoaderQueue = new Bull('metaLoader', {
         redis: {
           port: property["jobqueue-redis"].port,
-          host: property["jobqueue-redis"].host
+          host: redisHost
         }
       })
 
