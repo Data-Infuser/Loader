@@ -1,5 +1,4 @@
 import { getConnection, getRepository } from "typeorm";
-import { ServiceStatus } from "./entity/manager/Service";
 import DataLoadStrategy from "./lib/data-loader/DataLoadStrategy";
 import MysqlStrategy from "./lib/data-loader/strategies/MysqlStrategy";
 import CubridStrategy from "./lib/data-loader/strategies/CubridStrategy";
@@ -36,42 +35,42 @@ class DataLoaderController {
 
       //transaction start
       //Scheduled 상태의 Service만 선택하여, Data Load 진행
-      for(const service of stage.services) {
-        if(service.status != ServiceStatus.SCHEDULED) continue;
-        //Load Data
-        let loadStrategy: DataLoadStrategy;
+      // for(const service of stage.services) {
+      //   if(service.status != ServiceStatus.SCHEDULED) continue;
+      //   //Load Data
+      //   let loadStrategy: DataLoadStrategy;
         
-        if(service.meta.dataType === 'dbms') {
-          switch(service.meta.dbms) {
-            case 'mysql':
-              loadStrategy = new MysqlStrategy(queryRunner);
-              break;
-            case 'cubrid':
-              loadStrategy = new CubridStrategy(queryRunner);
-              break;
-            default:
-              console.log("unacceptable dbms")
-              throw new Error("unacceptable dbms");
-          }
-        } else if(service.meta.dataType === 'file' || service.meta.dataType === 'file-url') {
-          switch(service.meta.extension) {
-            case 'xlsx':
-              loadStrategy = new XlsxStrategy(queryRunner);
-              break;
-            case 'csv':
-              loadStrategy = new CsvStrategy(queryRunner);
-              break;
-            default:
-              console.log("unacceptable file extenseion")
-              throw new Error("unacceptable file extenseion");
-          }
-        } else {
-          console.log("unacceptable dataType")
-          throw new Error("unacceptable dataType")
-        }
-        const loader = new DataLoader(loadStrategy);
-        await loader.load(stage, service);
-      }
+      //   if(service.meta.dataType === 'dbms') {
+      //     switch(service.meta.dbms) {
+      //       case 'mysql':
+      //         loadStrategy = new MysqlStrategy(queryRunner);
+      //         break;
+      //       case 'cubrid':
+      //         loadStrategy = new CubridStrategy(queryRunner);
+      //         break;
+      //       default:
+      //         console.log("unacceptable dbms")
+      //         throw new Error("unacceptable dbms");
+      //     }
+      //   } else if(service.meta.dataType === 'file' || service.meta.dataType === 'file-url') {
+      //     switch(service.meta.extension) {
+      //       case 'xlsx':
+      //         loadStrategy = new XlsxStrategy(queryRunner);
+      //         break;
+      //       case 'csv':
+      //         loadStrategy = new CsvStrategy(queryRunner);
+      //         break;
+      //       default:
+      //         console.log("unacceptable file extenseion")
+      //         throw new Error("unacceptable file extenseion");
+      //     }
+      //   } else {
+      //     console.log("unacceptable dataType")
+      //     throw new Error("unacceptable dataType")
+      //   }
+      //   const loader = new DataLoader(loadStrategy);
+      //   await loader.load(stage, service);
+      // }
 
       job.progress(80);
 

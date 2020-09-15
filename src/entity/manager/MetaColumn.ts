@@ -1,6 +1,7 @@
-import {Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, CreateDateColumn, ManyToOne} from "typeorm";
-import { Length } from "class-validator";
+import {Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, CreateDateColumn, ManyToOne, OneToMany} from "typeorm";
+import { Length, IsNotEmpty } from "class-validator";
 import { Meta } from "./Meta";
+import { MetaParam } from './MetaParam';
 
 export enum AcceptableType {
   BIGINT="bigint",
@@ -35,6 +36,13 @@ export class MetaColumn {
   })
   type: AcceptableType;
 
+  @Column({
+    type: "enum",
+    enum: AcceptableType,
+    default: AcceptableType.VARCHAR
+  })
+  originalType: AcceptableType;
+
   @Column({ nullable: true })
   size: number;
 
@@ -42,8 +50,17 @@ export class MetaColumn {
   // xlsx 파일에서 column과 순서를 맞추기 위해서 사용
   order: number;
 
+  @Column({ default: false })
+  isHidden: boolean;
+
+  @Column({ default: false })
+  isSearchable: boolean;
+
   @ManyToOne(type => Meta, meta => meta.columns, { nullable: true, onDelete: 'CASCADE' })
   meta: Meta;
+
+  @OneToMany(type => MetaParam, mp => mp.metaColumn)
+  params: MetaParam[];
 
   @Column()
   @CreateDateColumn()

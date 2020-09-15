@@ -1,22 +1,22 @@
 import { getRepository, getManager } from "typeorm";
-import { Service, ServiceStatus } from "./entity/manager/Service";
+import { Service } from "./entity/manager/Service";
 import property from "../property.json"
 import { createWriteStream } from "fs";
 import Axios from "axios";
+import { Meta, MetaStatus } from "./entity/manager/Meta";
 
 class MetaLoaderController {
   static async loadMeta(job, done) {
     try {
       job.progress(1);
-      const serviceRepo = getRepository(Service);
-      const service = await serviceRepo.findOneOrFail({
-        relations: ["meta"],
+      const metaRepo = getRepository(Meta);
+      const meta = await metaRepo.findOneOrFail({
         where: {
-          id: job.data.serviceId
+          id: job.data.metaId
         }
       });
       job.progress(10);
-      if(service.status !== ServiceStatus.METASCHEDULED) {
+      if(meta.status !== MetaStatus.DOWNLOAD_SCHEDULED) {
         const err = new Error("It's not a MetaScheduled Status");
         done(err)
         return;
@@ -44,12 +44,11 @@ class MetaLoaderController {
           writer.on('close', async () => {
             if (!error) {
               job.progress(70);
-              service.status = ServiceStatus.METADOWNLOADED;
-              service.meta.filePath = filePath;
-              service.meta.originalFileName = fileName;
+              meta.status = MetaStatus.DOWNLOAD_DONE;
+              meta.filePath = filePath;
+              meta.originalFileName = fileName;
               await getManager().transaction("SERIALIZABLE", async transactionalEntityManager => {
-                await transactionalEntityManager.save(service);
-                await transactionalEntityManager.save(service.meta);
+                await transactionalEntityManager.save(meta);
               });
               job.progress(100);
               done();
