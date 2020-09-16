@@ -35,5 +35,5 @@ stage:
 	sudo npm install
 	sudo make build
 	make docker-build
-	-i docker container stop $$(docker container ls -q --filter name=${APP}*)
+	-docker container stop $$(docker container ls -q --filter name=${APP}*)
 	make run-docker

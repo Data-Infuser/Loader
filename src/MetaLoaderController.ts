@@ -17,7 +17,7 @@ class MetaLoaderController {
       });
       job.progress(10);
       if(meta.status !== MetaStatus.DOWNLOAD_SCHEDULED) {
-        const err = new Error("It's not a MetaScheduled Status");
+        const err = new Error("It's not a DOWNLOAD_SCHEDULED Status");
         done(err)
         return;
       }
