@@ -1,7 +1,6 @@
 import DataLoadStrategy from './DataLoadStrategy';
-import { Service } from '../../entity/manager/Service';
-import { Application } from '../../entity/manager/Application';
 import { Stage } from '../../entity/manager/Stage';
+import { Meta } from '../../entity/manager/Meta';
 
 class DataLoader {
   private dataLoadStrategy: DataLoadStrategy;
@@ -10,8 +9,8 @@ class DataLoader {
     this.dataLoadStrategy = dataLoadStrategy;
   }
 
-  public async load(stage: Stage, service: Service) {
-    await this.dataLoadStrategy.load(stage, service);
+  public async load(stage: Stage, meta: Meta) {
+    await this.dataLoadStrategy.load(stage, meta);
   }
 }
 

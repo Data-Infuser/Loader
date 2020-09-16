@@ -1,9 +1,8 @@
-import { Service, ServiceStatus } from '../../entity/manager/Service';
+import { Service } from '../../entity/manager/Service';
 import { Application } from '../../entity/manager/Application';
-import { Meta } from '../../entity/manager/Meta';
+import { Meta, MetaStatus } from '../../entity/manager/Meta';
 import { QueryRunner } from 'typeorm/query-runner/QueryRunner';
 import { getConnection, Table } from 'typeorm';
-import { ServiceColumn } from '../../entity/manager/ServiceColumn';
 import { TableOptions } from 'typeorm/schema-builder/options/TableOptions';
 import { Stage } from '../../entity/manager/Stage';
 
@@ -16,19 +15,16 @@ abstract class DataLoadStrategy {
     this.defaultQueryRunner = defaultQueryRunner;
   }
   
-  async load(stage: Stage,service:Service) {
+  async load(stage: Stage, meta: Meta) {
     const datasetQueryRunner = await getConnection('dataset').createQueryRunner();
     return new Promise(async (resolve, reject) => {
       try {
-        service.stage = stage;
-        const meta = service.meta;  
         const metaColumns = meta.columns;
-        service.tableName = `${stage.application.id}-${stage.id}-${service.id}`
+        const tableName = `${stage.application.id}-${stage.id}-${meta.id}`
         // column data 생성
         let columns = []
         let columnNames = []
         let originalColumnNames = []
-        let serviceColumns: ServiceColumn[] = []
 
         metaColumns.forEach(column => {
           columnNames.push(`\`${column.columnName}\``)
@@ -42,11 +38,10 @@ abstract class DataLoadStrategy {
             type: column.type,
             isNullable: true
           })
-          serviceColumns.push(new ServiceColumn(column.columnName, type, service));
         });
 
         const tableOption: TableOptions = {
-          name: service.tableName,
+          name: tableName,
           columns: columns
         }
 
@@ -54,18 +49,15 @@ abstract class DataLoadStrategy {
 
         let insertValues = await this.generateRows(meta, originalColumnNames);
         this.tablesForDelete.push(tableOption.name);
-        await datasetQueryRunner.dropTable(service.tableName, true);
+        await datasetQueryRunner.dropTable(tableName, true);
         await datasetQueryRunner.createTable(new Table(tableOption));
         await datasetQueryRunner.query(insertQuery, [insertValues]);
-        meta.isActive = true;
-        service.status = ServiceStatus.LOADED;
+        meta.status = MetaStatus.DATA_LOADED;
         await this.defaultQueryRunner.manager.save(meta);
-        await this.defaultQueryRunner.manager.save(service);
-        await this.defaultQueryRunner.manager.save(serviceColumns);
         resolve();
       } catch(err) {
-        service.status = ServiceStatus.FAILED;
-        await this.defaultQueryRunner.manager.save(service);
+        meta.status = MetaStatus.FAILED;
+        await this.defaultQueryRunner.manager.save(meta);
         reject(err);
       }
     })
