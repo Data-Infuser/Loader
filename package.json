@@ -8,7 +8,8 @@
         "start": "set debug=* && ts-node-dev --ignore-watch node_modules --respawn --transpileOnly ./src/index.ts",
         "testServer": "set debug=* && NODE_ENV=test ts-node-dev --ignore-watch node_modules --respawn --transpileOnly ./src/index.ts",
         "build": "tsc -p .",
-        "deploy-stage": "scp property-stage.json ubuntu@13.125.199.14:/home/ubuntu/loader/property.json && ssh ubuntu@13.125.199.14 'cd loader && git pull' && ssh ubuntu@13.125.199.14 'cd loader && make stage'"
+        "deploy-stage": "scp property-stage.json ubuntu@13.125.199.14:/home/ubuntu/loader/property.json && ssh ubuntu@13.125.199.14 'cd loader && git pull' && ssh ubuntu@13.125.199.14 'cd loader && make stage'",
+        "log-stage": " ssh ubuntu@13.125.199.14 'cd loader && make docker-log'"
     },
     "repository": {
         "type": "git",
