@@ -94,32 +94,42 @@ class DataLoaderController {
   }
 
   static async handleFailed(job, err) {
-    const stageId = job.data.id;
-    const stageRepo = getRepository(Stage);
-    const logRepo = getRepository(LoaderLog);
-    const stage:Stage = await stageRepo.findOneOrFail(stageId);
-    stage.status = StageStatus.FAILED;
+    try {
+      const stageId = job.data.id;
+      const stageRepo = getRepository(Stage);
+      const logRepo = getRepository(LoaderLog);
+      const stage:Stage = await stageRepo.findOneOrFail(stageId);
+      stage.status = StageStatus.FAILED;
 
-    const log = new LoaderLog();
-    log.stage = stage;
-    log.content = err.stack;
-    log.message = err.message;
-    log.isFailed = true;
-    await logRepo.save(log);
-    await stageRepo.save(stage);
+      const log = new LoaderLog();
+      log.stage = stage;
+      log.content = err.stack;
+      log.message = err.message;
+      log.isFailed = true;
+      await logRepo.save(log);
+      await stageRepo.save(stage);
+    } catch (err) {
+      console.error(err);
+    }
+    
     //await job.remove();
   }
 
   static async handleCompleted(job) {
-    const stageId = job.data.id;
-    const stageRepo = getRepository(Stage);
-    const logRepo = getRepository(LoaderLog);
-    const stage:Stage = await stageRepo.findOneOrFail(stageId);
+    try {
+      const stageId = job.data.id;
+      const stageRepo = getRepository(Stage);
+      const logRepo = getRepository(LoaderLog);
+      const stage:Stage = await stageRepo.findOneOrFail(stageId);
 
-    const log = new LoaderLog();
-    log.stage = stage;
-    log.isFailed = false;
-    await logRepo.save(log);
+      const log = new LoaderLog();
+      log.stage = stage;
+      log.isFailed = false;
+      await logRepo.save(log);
+    } catch (err) {
+      console.error(err);
+    }
+    
     //await job.remove();
   }
 }
