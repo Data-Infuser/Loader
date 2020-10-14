@@ -20,7 +20,7 @@ abstract class DataLoadStrategy {
     return new Promise(async (resolve, reject) => {
       try {
         const metaColumns = meta.columns;
-        const tableName = `${stage.application.id}-${stage.id}-${meta.id}`
+        const tableName = `${stage.id}-${meta.service.id}`
         // column data 생성
         let columns = []
         let columnNames = []

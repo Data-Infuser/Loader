@@ -90,6 +90,8 @@ class DataLoaderController {
         await stageRepo.save(stage);
       }
       done(err);
+    } finally {
+      await queryRunner.release();
     }
   }
 
