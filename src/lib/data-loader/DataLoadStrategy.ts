@@ -35,7 +35,7 @@ abstract class DataLoadStrategy {
           }
           columns.push({
             name: column.columnName,
-            type: column.type,
+            type: type,
             isNullable: true
           })
         });
