@@ -1,13 +1,15 @@
 import {createConnection} from "typeorm";
-import Bull from 'bull';
+import Bull, { JobOptions } from 'bull';
 import property from "../property.json"
 import ormConfig from "./config/ormConfig";
-import DataLoaderController from './DataLoaderController';
-import MetaLoaderController from './MetaLoaderController';
+import DataLoaderController from './controller/DataLoaderController';
+import MetaLoaderController from './controller/MetaLoaderController';
+import CrawlerController from './controller/CrawlerController';
 
 export class Loader {
   dataLoaderQueue:Bull.Queue;
   metaLoaderQueue: Bull.Queue;
+  crawlerQueue: Bull.Queue;
   
   constructor() {}
 
@@ -41,10 +43,27 @@ export class Loader {
       }
     })
 
+    this.crawlerQueue = new Bull('crawler', {
+      redis: {
+        port: property["jobqueue-redis"].port,
+        host: redisHost
+      }
+    })
+
+    // data loader
     this.dataLoaderQueue.process((job, done) => DataLoaderController.loadData(job, done))
     this.dataLoaderQueue.on("failed", (job, err) => DataLoaderController.handleFailed(job, err));
     this.dataLoaderQueue.on("completed", (job) => DataLoaderController.handleCompleted(job));
 
+    // meta loader
     this.metaLoaderQueue.process((job, done) => MetaLoaderController.loadMeta(job, done));
+
+    const jobOption:JobOptions = {
+      repeat: {
+        cron: '5 0 * * *'
+      }
+    }
+    await this.crawlerQueue.add({}, jobOption)
+    this.crawlerQueue.process((job, done) => CrawlerController.start(job, done));
   }
 }

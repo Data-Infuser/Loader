@@ -1,9 +1,8 @@
 import { getRepository, getManager } from "typeorm";
-import { Service } from "./entity/manager/Service";
-import property from "../property.json"
+import property from "../../property.json"
 import { createWriteStream } from "fs";
 import Axios from "axios";
-import { Meta, MetaStatus } from "./entity/manager/Meta";
+import { Meta, MetaStatus } from "../entity/manager/Meta";
 
 class MetaLoaderController {
   static async loadMeta(job, done) {

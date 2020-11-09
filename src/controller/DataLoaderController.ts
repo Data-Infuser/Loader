@@ -1,13 +1,13 @@
 import { getConnection, getRepository } from "typeorm";
-import DataLoadStrategy from "./lib/data-loader/DataLoadStrategy";
-import MysqlStrategy from "./lib/data-loader/strategies/MysqlStrategy";
-import CubridStrategy from "./lib/data-loader/strategies/CubridStrategy";
-import XlsxStrategy from "./lib/data-loader/strategies/XlsxStrategy";
-import CsvStrategy from "./lib/data-loader/strategies/CsvStrategy";
-import DataLoader from "./lib/data-loader/DataLoader";
-import { LoaderLog } from "./entity/manager/LoaderLog";
-import { Stage, StageStatus } from "./entity/manager/Stage";
-import { MetaStatus } from "./entity/manager/Meta";
+import DataLoadStrategy from "../lib/data-loader/DataLoadStrategy";
+import MysqlStrategy from "../lib/data-loader/strategies/MysqlStrategy";
+import CubridStrategy from "../lib/data-loader/strategies/CubridStrategy";
+import XlsxStrategy from "../lib/data-loader/strategies/XlsxStrategy";
+import CsvStrategy from "../lib/data-loader/strategies/CsvStrategy";
+import DataLoader from "../lib/data-loader/DataLoader";
+import { LoaderLog } from "../entity/manager/LoaderLog";
+import { Stage, StageStatus } from "../entity/manager/Stage";
+import { MetaStatus } from "../entity/manager/Meta";
 
 class DataLoaderController {
   static async loadData(job, done) {
