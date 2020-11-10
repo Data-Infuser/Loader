@@ -1,6 +1,6 @@
 import { getRepository, getManager } from "typeorm";
 import { Service } from "./entity/manager/Service";
-import property from "../property.json"
+import propertyConfigs from "./config/propertyConfig"
 import { createWriteStream } from "fs";
 import Axios from "axios";
 import { Meta, MetaStatus } from "./entity/manager/Meta";
@@ -24,7 +24,7 @@ class MetaLoaderController {
 
       const url = job.data.url;
       const fileName = job.data.fileName;
-      const filePath = property["upload-dist"].localPath + "/" + fileName
+      const filePath = propertyConfigs.uploadDist.localPath + "/" + fileName
       const writer = createWriteStream(filePath);
       job.progress(20);
       Axios({
