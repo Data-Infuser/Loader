@@ -63,7 +63,9 @@ export class Loader {
         cron: '5 0 * * *'
       }
     }
-    await this.crawlerQueue.add({}, jobOption)
+    // await this.crawlerQueue.add({}, jobOption)
+    await this.crawlerQueue.add({})
+
     this.crawlerQueue.process((job, done) => CrawlerController.start(job, done));
   }
 }

@@ -5,6 +5,8 @@
   },
   "upload-dist": {
     "type": "local",
-    "localPath": "/Users/chunghyup/projects/api-gen/api-designer/server/upload"
+    "localPath": "/Users/chunghyup/projects/api-gen/api-designer/server/upload",
+    "awsConfigPath": "./configs/aws-config.json",
+    "s3Bucket": "bucker-name"
   }
 }

@@ -12,3 +12,5 @@ ormconfig.json
 package-lock.json
 property.json
 property-stage.json
+
+aws-config.json
