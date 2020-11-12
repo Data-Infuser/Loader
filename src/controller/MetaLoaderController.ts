@@ -71,7 +71,15 @@ class MetaLoaderController {
     }
   }
 
-  public async loadMetaFromFile(fileParam:MetaLoaderFileParam):Promise<any> {
+  static async loadMeta(job, done) {
+    try {
+      done();
+    } catch(err) {
+      done(err);
+    }
+  }
+
+  static async loadMetaFromFile(fileParam:MetaLoaderFileParam):Promise<any> {
     return new Promise( async (resolve, reject) => {
       try {
         let loadStrategy: MetaLoadStrategy;
