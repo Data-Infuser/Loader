@@ -12,7 +12,7 @@ import { application } from 'express';
  */
 class Crawler {
   private page: number = 1;
-  private perPage: number = 10;
+  private perPage: number = 100;
   private totalPage: number = 0;
   private pkDict: Map<string, Data[]> = new Map();
   private failList: Data[] = [];
@@ -20,16 +20,13 @@ class Crawler {
   private userId = 3;
 
   constructor(perPage?: number) {
-    console.log("Create Crawler");
     if (perPage) { this.perPage = perPage }
   }
 
 
   public async start(): Promise<Application[]> {
-    console.log("Start Crawling");
     await this.makeDict();
     const applications = this.genApplications();
-    console.log("Crawling done");
     return Promise.resolve(applications);
   }
 
@@ -39,7 +36,7 @@ class Crawler {
 
       for(let el of jsonData.data) {
         // file_nm 이 없는 경우 pass
-        if(!el.file_nm) {
+        if(!el.file_nm || el.download_url.trim().length === 0) {
           this.failList.push(el);
           continue;
         }
@@ -82,6 +79,7 @@ class Crawler {
       application.title = dataForApplication.public_data_sj; // 목록 명 => application.title
       application.description = dataForApplication.etc_atent_matter;
       application.userId = this.userId;
+      application.nameSpace = dataForApplication.public_data_pk;
       const stage = new Stage();
       stage.name = "1";
       stage.userId = this.userId;
@@ -108,10 +106,10 @@ class Crawler {
     // 첫번쨰 페이지를 받아올 때 처리에 필요한 변수 저장
     if (this.page === 1) {
       // this.totalPage = sampleData.page.totalPage;
-      this.totalPage = 3;
+      this.totalPage = 1;
     }
-    this.page++;
     if (this.page % 1 === 0) { console.log(`current page ${this.page}`) }
+    this.page++;
     const response = await Axios.get(`https://www.data.go.kr/api/dataset/csvFileData.do?key=ptech-VfP6vI90Xr&page=${this.page}&per_page=${this.perPage}`)
     const jsonData = response.data;
     return Promise.resolve(jsonData);

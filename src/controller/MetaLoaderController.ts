@@ -54,6 +54,10 @@ class MetaLoaderController {
             }
           });
         }
+      ).catch(
+        err => {
+          done(err);
+        }
       )
     } catch (err) {
       done(err);
