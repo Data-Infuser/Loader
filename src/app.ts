@@ -1,6 +1,7 @@
 import {createConnection} from "typeorm";
 import Bull, { JobOptions } from 'bull';
 import property from "../property.json"
+import propertyConfigs from "./config/propertyConfig"
 import ormConfig from "./config/ormConfig";
 import DataLoaderController from './controller/DataLoaderController';
 import MetaLoaderController from './controller/MetaLoaderController';
@@ -21,13 +22,19 @@ export class Loader {
     const datasetConnection = {
       ...ormConfig.datasetConnection
     }
-    let redisHost = property["jobqueue-redis"].host
+    let redisHost = propertyConfigs.jobqueueRedis.host
     if(process.env.NODE_ENV !== 'production') {
       redisHost = "localhost"
       defaultConnection.database ="designer-test"
     }
-    await createConnection(defaultConnection).catch(error => console.log(error));
-    await createConnection(datasetConnection).catch(error => console.log(error));
+
+    try {
+      await createConnection(defaultConnection);
+      await createConnection(datasetConnection);
+    } catch(err) {
+      console.log(err);
+      process.exit(1);
+    }
 
     await BullManager.Instance.setupQueues();
 

@@ -1,0 +1,12 @@
+{
+    "jobqueueRedis": {
+        "host": "localhost",
+        "port": 6379
+    },
+    "uploadDist": {
+        "type": "local",
+        "localPath": "/Users/chunghyup/projects/api-gen/api-designer/server/upload",
+        "awsConfigPath": "./configs/aws-config.json",
+        "s3Bucket": "bucker-name"   
+    }
+}

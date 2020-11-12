@@ -1,8 +1,8 @@
 import Bull, { JobOptions } from "bull";
-import property from "../../property.json"
 import CrawlerController from "../controller/CrawlerController";
 import DataLoaderController from "../controller/DataLoaderController";
 import MetaLoaderController from "../controller/MetaLoaderController";
+import propertyConfigs from "../config/propertyConfig"
 
 export default class BullManager {
 
@@ -13,29 +13,29 @@ export default class BullManager {
   crawlerQueue: Bull.Queue;
 
   constructor() {
-
-    let redisHost = property["jobqueue-redis"].host
+    
+    let redisHost = propertyConfigs.jobqueueRedis.host
     if(process.env.NODE_ENV !== 'production') {
       redisHost = "localhost"
     }
 
     this.dataLoaderQueue = new Bull('dataLoader', {
       redis: {
-        port: property["jobqueue-redis"].port,
+        port: propertyConfigs.jobqueueRedis.port,
         host: redisHost
       }
     });
 
     this.metaLoaderQueue = new Bull('metaLoader', {
       redis: {
-        port: property["jobqueue-redis"].port,
+        port: propertyConfigs.jobqueueRedis.port,
         host: redisHost
       }
     })
 
     this.crawlerQueue = new Bull('crawler', {
       redis: {
-        port: property["jobqueue-redis"].port,
+        port: propertyConfigs.jobqueueRedis.port,
         host: redisHost
       }
     })
@@ -71,7 +71,7 @@ export default class BullManager {
       }
     }
     // await this.crawlerQueue.add({}, jobOption)
-    // await this.crawlerQueue.add({}, jobRepoeatOption)
+    await this.crawlerQueue.add({}, jobRepoeatOption)
 
     this.crawlerQueue.process((job, done) => CrawlerController.start(job, done));
   }
