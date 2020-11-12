@@ -5,9 +5,14 @@ import propertyConfigs from "../config/propertyConfig"
 import { createWriteStream } from "fs";
 import Axios from "axios";
 import { Meta, MetaStatus } from "../entity/manager/Meta";
+import MetaLoaderFileParam from "../lib/meta-loader/interfaces/MetaLoaderFileParam";
+import MetaLoadStrategy from "../lib/meta-loader/MetaLoadStrategy";
+import XlsxMetaLoadStrategy from "../lib/meta-loader/strategies/XlsxMetaLoadStrategy";
+import CsvMetaLoadStrategy from "../lib/meta-loader/strategies/CsvMetaLoadStrategy";
+import MetaLoader from "../lib/meta-loader/MetaLoader";
 
 class MetaLoaderController {
-  static async loadMeta(job, done) {
+  static async downloadFile(job, done) {
     try {
       job.progress(1);
       const metaRepo = getRepository(Meta);
@@ -64,6 +69,29 @@ class MetaLoaderController {
     } catch (err) {
       done(err);
     }
+  }
+
+  public async loadMetaFromFile(fileParam:MetaLoaderFileParam):Promise<any> {
+    return new Promise( async (resolve, reject) => {
+      try {
+        let loadStrategy: MetaLoadStrategy;
+        switch(fileParam.ext) {
+          case 'xlsx':
+            loadStrategy = new XlsxMetaLoadStrategy();
+            break;
+          case 'csv':
+            loadStrategy = new CsvMetaLoadStrategy();
+            break;
+          default:
+            throw new Error('UNACCEPTABLE_FILE_EXT')
+        }
+        const metaLoader = new MetaLoader(loadStrategy);
+        const loaderResult = await metaLoader.loadMeta(fileParam);
+        resolve(loaderResult)
+      } catch (err) {
+        reject(err);
+      }
+    })
   }
 }
 

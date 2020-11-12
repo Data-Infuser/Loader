@@ -3,6 +3,9 @@ import CrawlerController from "../controller/CrawlerController";
 import DataLoaderController from "../controller/DataLoaderController";
 import MetaLoaderController from "../controller/MetaLoaderController";
 import propertyConfigs from "../config/propertyConfig"
+import { Meta } from "../entity/manager/Meta";
+import { getRepository } from "typeorm";
+import MetaLoaderFileParam from "./meta-loader/interfaces/MetaLoaderFileParam";
 
 export default class BullManager {
 
@@ -10,6 +13,7 @@ export default class BullManager {
 
   dataLoaderQueue: Bull.Queue;
   metaLoaderQueue: Bull.Queue;
+  downloadQueue: Bull.Queue;
   crawlerQueue: Bull.Queue;
 
   constructor() {
@@ -40,6 +44,13 @@ export default class BullManager {
       }
     })
 
+    this.downloadQueue = new Bull('download', {
+      redis: {
+        port: propertyConfigs.jobqueueRedis.port,
+        host: redisHost
+      }
+    })
+
   }
 
   public static get Instance() {
@@ -57,6 +68,9 @@ export default class BullManager {
 
     // meta loader
     this.metaLoaderQueue.process((job, done) => MetaLoaderController.loadMeta(job, done));
+
+    //download
+    this.downloadQueue.process((job, done) => MetaLoaderController.downloadFile(job, done));
 
     const jobOption:JobOptions = {
       repeat: {
