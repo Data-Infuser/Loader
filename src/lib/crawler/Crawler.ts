@@ -12,7 +12,7 @@ import { application } from 'express';
  */
 class Crawler {
   private page: number = 1;
-  private perPage: number = 100;
+  private perPage: number = 50;
   private totalPage: number = 0;
   private pkDict: Map<string, Data[]> = new Map();
   private failList: Data[] = [];

@@ -2,6 +2,7 @@ import { S3Strategy } from "./S3Strategy"
 import property from "../../../property.json"
 import fs from "fs";
 import { PutObjectRequest } from "aws-sdk/clients/s3";
+import propertyConfigs from "../../config/propertyConfig";
 
 
 interface FileManagerOptions {
@@ -32,8 +33,8 @@ class FileManager {
   }
 
   public static get Instance() {
-    if(this._instance) {
-      const config = property["upload-dist"]
+    if(!this._instance) {
+      const config = propertyConfigs.uploadDist
       this._instance = new FileManager({
         type: config.type,
         awsConfigPath: config.awsConfigPath,
@@ -48,8 +49,14 @@ class FileManager {
     return await this.s3Strategy.saveFile(path, file);
   }
 
+  saveStream(path: string) {
+    return this.s3Strategy.saveStream(path);
+  }
+
   async downloadFile(path: string) {
     return await this.s3Strategy.loadFile(path);
   }
 
 }
+
+export default FileManager;

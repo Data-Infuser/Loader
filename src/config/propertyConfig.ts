@@ -9,12 +9,9 @@ const jobqueueRedis = {
 }
 const uploadDist = {
     type: process.env.LOADER_UPLOAD_DIST_TYPE || uploadDist_origin.type,
-    localPath: process.env.LOADER_UPLOAD_DIST_LOCAL_PATH || uploadDist_origin.localPath
-}
-
-if(uploadDist.type === 's3') {
-    uploadDist['awsConfigPath'] =  process.env.LOADER_UPLOAD_AWS_CONFIG_PATH || uploadDist_origin.awsConfigPath,
-    uploadDist['s3Bucket'] = process.env.LOADER_UPLOAD_S3_BUCKET || uploadDist_origin.s3Bucket
+    localPath: process.env.LOADER_UPLOAD_DIST_LOCAL_PATH || uploadDist_origin.localPath,
+    awsConfigPath:  process.env.LOADER_UPLOAD_AWS_CONFIG_PATH || uploadDist_origin.awsConfigPath,
+    s3Bucket: process.env.LOADER_UPLOAD_S3_BUCKET || uploadDist_origin.s3Bucket
 }
 
 const propertyConfigs = {

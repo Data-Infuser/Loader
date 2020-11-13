@@ -13,6 +13,7 @@ import MetaLoader from "../lib/meta-loader/MetaLoader";
 import MysqlMetaLoadStrategy from "../lib/meta-loader/strategies/MysqlMetaLoadStrategy";
 import CubridMetaLoadStrategy from "../lib/meta-loader/strategies/CubridMetaLoadStrategy";
 import MetaLoaderDbConnection from "../lib/meta-loader/interfaces/MetaLoaderDbConnection";
+import FileManager from '../lib/file-manager/FileManager';
 
 class MetaLoaderController {
   static async downloadFile(job, done) {
@@ -34,7 +35,7 @@ class MetaLoaderController {
       const url = job.data.url;
       const fileName = job.data.fileName;
       const filePath = propertyConfigs.uploadDist.localPath + "/" + fileName
-      const writer = createWriteStream(filePath);
+
       job.progress(20);
       Axios({
         method: "get",
@@ -43,14 +44,14 @@ class MetaLoaderController {
       }).then(
         response => {
           job.progress(40);
-          response.data.pipe(writer);
+          const uploadStream = response.data.pipe(FileManager.Instance.saveStream(fileName));
           let error = null;
-          writer.on('error', err => {
+          uploadStream.on('error', err => {
             error = err;
-            writer.close();
+            uploadStream.close();
             done(err);
           });
-          writer.on('close', async () => {
+          uploadStream.on('close', async () => {
             if (!error) {
               job.progress(70);
               meta.status = MetaStatus.DOWNLOAD_DONE;

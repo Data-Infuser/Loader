@@ -2,6 +2,7 @@ import * as AWS from 'aws-sdk';
 import { GetObjectRequest, PutObjectRequest } from 'aws-sdk/clients/s3';
 import fs from "fs";
 import { Readable } from 'typeorm/platform/PlatformTools';
+import * as stream from "stream";
 
 export class S3Strategy {
   s3: AWS.S3
@@ -44,5 +45,28 @@ export class S3Strategy {
         reject(err);
       }
     })
+  }
+
+  saveStream = (path: string) => {
+    const Body = new stream.PassThrough();
+
+    this.s3.upload({
+      Bucket: this.bucket,
+      Key: path,
+      Body
+    })
+    .on('httpUploadProgress', progress => {
+        // console.log('progress', progress);
+    })
+    .send((err, data) => {
+      if (err) {
+        Body.destroy(err);
+      } else {
+        // console.log(`File uploaded and available at ${data.Location}`);
+        Body.destroy();
+      }
+    });
+
+    return Body;
   }
 }
