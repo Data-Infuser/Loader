@@ -10,6 +10,9 @@ import MetaLoadStrategy from "../lib/meta-loader/MetaLoadStrategy";
 import XlsxMetaLoadStrategy from "../lib/meta-loader/strategies/XlsxMetaLoadStrategy";
 import CsvMetaLoadStrategy from "../lib/meta-loader/strategies/CsvMetaLoadStrategy";
 import MetaLoader from "../lib/meta-loader/MetaLoader";
+import MysqlMetaLoadStrategy from "../lib/meta-loader/strategies/MysqlMetaLoadStrategy";
+import CubridMetaLoadStrategy from "../lib/meta-loader/strategies/CubridMetaLoadStrategy";
+import MetaLoaderDbConnection from "../lib/meta-loader/interfaces/MetaLoaderDbConnection";
 
 class MetaLoaderController {
   static async downloadFile(job, done) {
@@ -22,7 +25,7 @@ class MetaLoaderController {
         }
       });
       job.progress(10);
-      if(meta.status !== MetaStatus.DOWNLOAD_SCHEDULED) {
+      if (meta.status !== MetaStatus.DOWNLOAD_SCHEDULED) {
         const err = new Error("It's not a DOWNLOAD_SCHEDULED Status");
         done(err)
         return;
@@ -73,17 +76,85 @@ class MetaLoaderController {
 
   static async loadMeta(job, done) {
     try {
+      const metaRepo = getRepository(Meta);
+      const metaId = job.data.metaId;
+      const meta = await metaRepo.findOne(metaId);
+      let loaderResult = await this.loadMetaFromSource(meta);;
+
+      const loadedMeta: Meta = loaderResult.meta;
+      const columns = loaderResult.columns;
+      loadedMeta.dataType = meta.dataType;
+      loadedMeta.remoteFilePath = meta.remoteFilePath;
+      loadedMeta.id = meta.id;
+      await getManager().transaction("SERIALIZABLE", async transactionalEntityManager => {
+        await transactionalEntityManager.save(loadedMeta);
+        await transactionalEntityManager.save(columns);
+      });
       done();
-    } catch(err) {
+    } catch (err) {
       done(err);
     }
   }
 
-  static async loadMetaFromFile(fileParam:MetaLoaderFileParam):Promise<any> {
-    return new Promise( async (resolve, reject) => {
+  static async loadMetaFromSource(meta: Meta): Promise<any> {
+    switch (meta.dataType) {
+      case 'file' || 'file-url':
+        const fileOption: MetaLoaderFileParam = {
+          title: meta.title,
+          skip: meta.skip,
+          sheet: meta.sheet,
+          filePath: meta.filePath,
+          originalFileName: meta.originalFileName,
+          ext: meta.extension
+        }
+        return Promise.resolve(await this.loadMetaFromFile(fileOption));
+      case 'dbms':
+        const dbOption: MetaLoaderDbConnection = {
+          dbms: meta.dbms,
+          username: meta.dbUser,
+          password: meta.pwd,
+          hostname: meta.host,
+          port: meta.port,
+          database: meta.db,
+          tableNm: meta.table,
+          title: meta.title
+        }
+        return Promise.resolve(await this.loadMetaFromDbms(dbOption));
+      default:
+        throw new Error('UnAcceptable Data Type');
+    }
+  }
+
+  static async loadMetaFromDbms(dbOption: MetaLoaderDbConnection): Promise<any> {
+    return new Promise(async (resolve, reject) => {
       try {
         let loadStrategy: MetaLoadStrategy;
-        switch(fileParam.ext) {
+        switch (dbOption.dbms) {
+          case 'mysql':
+            loadStrategy = new MysqlMetaLoadStrategy();
+            break;
+          case 'cubrid':
+            loadStrategy = new CubridMetaLoadStrategy();
+            break;
+          default:
+            throw new Error('UNACCEPTABLE_DBMS')
+        }
+
+        const metaLoader = new MetaLoader(loadStrategy);
+        const loaderResult = await metaLoader.loadMeta(dbOption);
+        resolve(loaderResult);
+      } catch (err) {
+        reject(err);
+      }
+    })
+
+  }
+
+  static async loadMetaFromFile(fileParam: MetaLoaderFileParam): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let loadStrategy: MetaLoadStrategy;
+        switch (fileParam.ext) {
           case 'xlsx':
             loadStrategy = new XlsxMetaLoadStrategy();
             break;

@@ -3,8 +3,11 @@ import MetaLoadStrategy from "../MetaLoadStrategy";
 import MetaLoaderDbConnection from "../interfaces/MetaLoaderDbConnection";
 import CUBRID = require('node-cubrid');
 import DbmsMetaLoadStrategy from "./DbmsMetaLoadStrategy";
+import { MetaInfo } from "../interfaces/MetaInfo";
+import { Meta } from "../../../entity/manager/Meta";
+import { MetaColumn } from "../../../entity/manager/MetaColumn";
 
-const mysqlTypes = require("../../util/dbms_data_types/mysql.json");
+const mysqlTypes = require("../dbms_data_types/mysql.json");;
 
 class CubridMetaLoadStrategy implements DbmsMetaLoadStrategy {
 
