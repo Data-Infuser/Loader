@@ -26,6 +26,7 @@ class FileManager {
 
   constructor(options:FileManagerOptions) {
     this.type = options.type;
+    console.log(this.type);
     if(options.awsConfigPath) { this.awsConfigPath = options.awsConfigPath; }
     if(options.localPath) { this.localPath = options.localPath; }
 
@@ -58,8 +59,8 @@ class FileManager {
     return this.fileManageStrategy.saveStream(path);
   }
 
-  async downloadFile(path: string) {
-    return await this.fileManageStrategy.loadFile(path);
+  loadFile(path: string) {
+    return this.fileManageStrategy.loadFile(path);
   }
 
 }

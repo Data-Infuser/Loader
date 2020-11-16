@@ -33,22 +33,16 @@ export class S3Strategy implements FileManageStrategy {
     })
   }
 
-  loadFile = async (path: string):Promise<Readable> => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const objReq: GetObjectRequest = {
-          Bucket: this.bucket,
-          Key: path
-        }
-        const stream = this.s3.getObject(objReq).createReadStream();
-        resolve(stream);
-      } catch (err) {
-        reject(err);
-      }
-    })
+  loadFile = (path: string): Readable => {
+    const objReq: GetObjectRequest = {
+      Bucket: this.bucket,
+      Key: path
+    }
+    const stream = this.s3.getObject(objReq).createReadStream();
+    return stream;
   }
 
-  saveStream = (path: string) => {
+  saveStream = (path: string) : { stream: Readable, path: string } => {
     const Body = new stream.PassThrough();
 
     this.s3.upload({
@@ -68,6 +62,9 @@ export class S3Strategy implements FileManageStrategy {
       }
     });
 
-    return Body;
+    return {
+      stream: Body,
+      path: path
+    }
   }
 }

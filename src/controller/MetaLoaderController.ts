@@ -1,8 +1,4 @@
 import { getRepository, getManager } from "typeorm";
-import property from "../../property.json"
-import { Service } from "../entity/manager/Service";
-import propertyConfigs from "../config/propertyConfig"
-import { createWriteStream } from "fs";
 import Axios from "axios";
 import { Meta, MetaStatus } from "../entity/manager/Meta";
 import MetaLoaderFileParam from "../lib/meta-loader/interfaces/MetaLoaderFileParam";
@@ -34,7 +30,6 @@ class MetaLoaderController {
 
       const url = job.data.url;
       const fileName = job.data.fileName;
-      const filePath = propertyConfigs.uploadDist.localPath + "/" + fileName
 
       job.progress(20);
       Axios({
@@ -44,7 +39,8 @@ class MetaLoaderController {
       }).then(
         response => {
           job.progress(40);
-          const uploadStream = response.data.pipe(FileManager.Instance.saveStream(fileName));
+          const { stream, path } = FileManager.Instance.saveStream(fileName)
+          const uploadStream = response.data.pipe(stream);
           let error = null;
           uploadStream.on('error', err => {
             error = err;
@@ -55,7 +51,7 @@ class MetaLoaderController {
             if (!error) {
               job.progress(70);
               meta.status = MetaStatus.DOWNLOAD_DONE;
-              meta.filePath = filePath;
+              meta.filePath = path;
               meta.originalFileName = fileName;
               await getManager().transaction("SERIALIZABLE", async transactionalEntityManager => {
                 await transactionalEntityManager.save(meta);
@@ -98,7 +94,6 @@ class MetaLoaderController {
   }
 
   static async loadMetaFromSource(meta: Meta): Promise<any> {
-    console.log(meta);
     const fileOption: MetaLoaderFileParam = {
       title: meta.title,
       skip: meta.skip,

@@ -4,6 +4,7 @@ import { MetaColumn, AcceptableType } from "../../../entity/manager/MetaColumn";
 import MetaLoaderFileParam from "../interfaces/MetaLoaderFileParam";
 import fs from 'fs';
 import moment from 'moment';
+import FileManager from '../../file-manager/FileManager';
 
 const parse = require('csv-parse/lib/sync')
 const iconv = require('iconv-lite');
@@ -27,7 +28,7 @@ class CsvMetaLoadStrategy implements MetaLoadStrategy {
 
         const originalFileNameTokens = originalFileName.split(".");
         const ext = originalFileNameTokens[originalFileNameTokens.length - 1]
-        const fileStream = fs.createReadStream(filePath);
+        const fileStream = FileManager.Instance.loadFile(filePath);
         let chunks = [];
         let rowCounts = 0;
         fileStream.on('error', (err) => {
