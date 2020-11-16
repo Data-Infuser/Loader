@@ -3,6 +3,7 @@ import { Service } from "../../../entity/manager/Service";
 import { Application } from "../../../entity/manager/Application";
 import { Meta } from "../../../entity/manager/Meta";
 import { QueryRunner } from "typeorm";
+import FileManager from "../../file-manager/FileManager";
 
 const Excel = require("exceljs");
 
@@ -16,7 +17,8 @@ class XlsxStrategy extends DataLoadStrategy {
     return new Promise(async(resolve, reject) => {
       try {
         let insertValues = []
-        const loadedWorkbook = await new Excel.Workbook().xlsx.readFile(meta.filePath);
+        const loadedWorkbook = await new Excel.Workbook().xlsx.read(FileManager.Instance.downloadFile(meta.filePath));
+        //const loadedWorkbook = await new Excel.Workbook().xlsx.readFile(meta.filePath);
         const worksheet = loadedWorkbook.worksheets[meta.sheet]
         const totalRowCount = worksheet.rowCount
         for(let i = meta.skip + 2; i <= totalRowCount; i++) {

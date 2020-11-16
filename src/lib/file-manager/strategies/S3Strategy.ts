@@ -3,8 +3,9 @@ import { GetObjectRequest, PutObjectRequest } from 'aws-sdk/clients/s3';
 import fs from "fs";
 import { Readable } from 'typeorm/platform/PlatformTools';
 import * as stream from "stream";
+import FileManageStrategy from '../FileManageStrategy';
 
-export class S3Strategy {
+export class S3Strategy implements FileManageStrategy {
   s3: AWS.S3
   bucket: string
   constructor(configPath: string, bucket: string) {

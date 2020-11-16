@@ -3,6 +3,7 @@ import { Meta } from "../../../entity/manager/Meta";
 import { QueryRunner } from "typeorm";
 import fs from 'fs';
 import readline from 'readline';
+import FileManager from "../../file-manager/FileManager";
 
 const parse = require('csv-parse/lib/sync')
 const iconv = require('iconv-lite');
@@ -17,8 +18,9 @@ class CsvStrategy extends DataLoadStrategy {
   async generateRows(meta:Meta, originalColumnNames:string[]): Promise<any[]> {
     return new Promise(async(resolve, reject) => {
       try {
-        const fileStream = fs.createReadStream(meta.filePath);
-
+        //const fileStream = fs.createReadStream(meta.filePath); 
+        const fileStream = await FileManager.Instance.downloadFile(meta.filePath); // 파일매니저를 통해서 스트림 받게 변경
+        
         const rl = readline.createInterface({
           input: fileStream.pipe(iconv.decodeStream(meta.encoding))
         })

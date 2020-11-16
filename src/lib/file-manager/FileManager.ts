@@ -1,8 +1,10 @@
-import { S3Strategy } from "./S3Strategy"
 import property from "../../../property.json"
 import fs from "fs";
 import { PutObjectRequest } from "aws-sdk/clients/s3";
 import propertyConfigs from "../../config/propertyConfig";
+import FileManageStrategy from "./FileManageStrategy";
+import { FsStrategy } from "./strategies/FsStrategy";
+import { S3Strategy } from "./strategies/S3Strategy"
 
 
 interface FileManagerOptions {
@@ -20,7 +22,7 @@ class FileManager {
   awsConfigPath?: string
   localPath?: string
 
-  s3Strategy: S3Strategy
+  fileManageStrategy: FileManageStrategy
 
   constructor(options:FileManagerOptions) {
     this.type = options.type;
@@ -28,7 +30,10 @@ class FileManager {
     if(options.localPath) { this.localPath = options.localPath; }
 
     if(this.type === 's3') {
-      this.s3Strategy = new S3Strategy(this.awsConfigPath, options.s3Bucket);
+      this.fileManageStrategy = new S3Strategy(this.awsConfigPath, options.s3Bucket);
+    }
+    else if(this.type === 'local') {
+      this.fileManageStrategy = new FsStrategy();
     }
   }
 
@@ -46,15 +51,15 @@ class FileManager {
   }
 
   async saveFile(path: string, file: Buffer) {
-    return await this.s3Strategy.saveFile(path, file);
+    return await this.fileManageStrategy.saveFile(path, file);
   }
 
   saveStream(path: string) {
-    return this.s3Strategy.saveStream(path);
+    return this.fileManageStrategy.saveStream(path);
   }
 
   async downloadFile(path: string) {
-    return await this.s3Strategy.loadFile(path);
+    return await this.fileManageStrategy.loadFile(path);
   }
 
 }

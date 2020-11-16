@@ -98,16 +98,19 @@ class MetaLoaderController {
   }
 
   static async loadMetaFromSource(meta: Meta): Promise<any> {
-    switch (meta.dataType) {
-      case 'file' || 'file-url':
-        const fileOption: MetaLoaderFileParam = {
-          title: meta.title,
-          skip: meta.skip,
-          sheet: meta.sheet,
-          filePath: meta.filePath,
-          originalFileName: meta.originalFileName,
-          ext: meta.extension
-        }
+    console.log(meta);
+    const fileOption: MetaLoaderFileParam = {
+      title: meta.title,
+      skip: meta.skip,
+      sheet: meta.sheet,
+      filePath: meta.filePath,
+      originalFileName: meta.originalFileName,
+      ext: meta.extension
+    }
+    switch (meta.dataType) { 
+      case 'file':
+        return Promise.resolve(await this.loadMetaFromFile(fileOption));
+      case 'file-url':
         return Promise.resolve(await this.loadMetaFromFile(fileOption));
       case 'dbms':
         const dbOption: MetaLoaderDbConnection = {
