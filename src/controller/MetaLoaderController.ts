@@ -30,7 +30,7 @@ class MetaLoaderController {
 
       const url = job.data.url;
       const fileName = job.data.fileName;
-
+      
       job.progress(20);
       Axios({
         method: "get",
@@ -39,7 +39,7 @@ class MetaLoaderController {
       }).then(
         response => {
           job.progress(40);
-          const { stream, path } = FileManager.Instance.saveStream(fileName)
+          const { stream, path } = FileManager.Instance.createWriteStream(fileName)
           const uploadStream = response.data.pipe(stream);
           let error = null;
           uploadStream.on('error', err => {

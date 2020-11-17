@@ -17,7 +17,7 @@ class XlsxStrategy extends DataLoadStrategy {
     return new Promise(async(resolve, reject) => {
       try {
         let insertValues = []
-        const loadedWorkbook = await new Excel.Workbook().xlsx.read(FileManager.Instance.loadFile(meta.filePath));
+        const loadedWorkbook = await new Excel.Workbook().xlsx.read(FileManager.Instance.createReadStream(meta.filePath));
         //const loadedWorkbook = await new Excel.Workbook().xlsx.readFile(meta.filePath);
         const worksheet = loadedWorkbook.worksheets[meta.sheet]
         const totalRowCount = worksheet.rowCount

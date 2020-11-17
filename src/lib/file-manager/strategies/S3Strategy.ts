@@ -9,7 +9,9 @@ export class S3Strategy implements FileManageStrategy {
   s3: AWS.S3
   bucket: string
   constructor(configPath: string, bucket: string) {
-    AWS.config.loadFromPath(configPath);
+    if (configPath !== 'env') {
+      AWS.config.loadFromPath(configPath);
+    }
     this.bucket = bucket;
     this.s3 = new AWS.S3;
   }
@@ -33,7 +35,7 @@ export class S3Strategy implements FileManageStrategy {
     })
   }
 
-  loadFile = (path: string): Readable => {
+  createReadStream = (path: string): Readable => {
     const objReq: GetObjectRequest = {
       Bucket: this.bucket,
       Key: path
@@ -42,7 +44,7 @@ export class S3Strategy implements FileManageStrategy {
     return stream;
   }
 
-  saveStream = (path: string) : { stream: Readable, path: string } => {
+  createWriteStream = (path: string) : { stream: Readable, path: string } => {
     const Body = new stream.PassThrough();
 
     this.s3.upload({

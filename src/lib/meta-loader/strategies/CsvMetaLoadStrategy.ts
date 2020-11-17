@@ -28,7 +28,7 @@ class CsvMetaLoadStrategy implements MetaLoadStrategy {
 
         const originalFileNameTokens = originalFileName.split(".");
         const ext = originalFileNameTokens[originalFileNameTokens.length - 1]
-        const fileStream = FileManager.Instance.loadFile(filePath);
+        const fileStream = FileManager.Instance.createReadStream(filePath);
         let chunks = [];
         let rowCounts = 0;
         fileStream.on('error', (err) => {

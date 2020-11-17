@@ -1,6 +1,3 @@
-import property from "../../../property.json"
-import fs from "fs";
-import { PutObjectRequest } from "aws-sdk/clients/s3";
 import propertyConfigs from "../../config/propertyConfig";
 import FileManageStrategy from "./FileManageStrategy";
 import { FsStrategy } from "./strategies/FsStrategy";
@@ -26,7 +23,6 @@ class FileManager {
 
   constructor(options:FileManagerOptions) {
     this.type = options.type;
-    console.log(this.type);
     if(options.awsConfigPath) { this.awsConfigPath = options.awsConfigPath; }
     if(options.localPath) { this.localPath = options.localPath; }
 
@@ -55,12 +51,12 @@ class FileManager {
     return await this.fileManageStrategy.saveFile(path, file);
   }
 
-  saveStream(path: string) {
-    return this.fileManageStrategy.saveStream(path);
+  createWriteStream(path: string) {
+    return this.fileManageStrategy.createWriteStream(path);
   }
 
-  loadFile(path: string) {
-    return this.fileManageStrategy.loadFile(path);
+  createReadStream(path: string) {
+    return this.fileManageStrategy.createReadStream(path);
   }
 
 }

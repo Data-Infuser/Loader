@@ -19,7 +19,7 @@ class CsvStrategy extends DataLoadStrategy {
     return new Promise(async(resolve, reject) => {
       try {
         //const fileStream = fs.createReadStream(meta.filePath); 
-        const fileStream = FileManager.Instance.loadFile(meta.filePath); // 파일매니저를 통해서 스트림 받게 변경
+        const fileStream = FileManager.Instance.createReadStream(meta.filePath); // 파일매니저를 통해서 스트림 받게 변경
         
         const rl = readline.createInterface({
           input: fileStream.pipe(iconv.decodeStream(meta.encoding))
