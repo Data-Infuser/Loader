@@ -47,6 +47,28 @@ class FileManager {
     return this._instance;
   }
 
+  getLocalPath() {
+    if(this.type === 's3') {
+      return './upload';
+    } else {
+      return this.localPath;
+    }
+  }
+
+  getS3Object() {
+    if(this.type === 's3') {
+      return (<S3Strategy>this.fileManageStrategy).s3;
+    }
+    return;
+  }
+
+  getBucket() {
+    if(this.type === 's3') {
+      return (<S3Strategy>this.fileManageStrategy).bucket;
+    }
+    return;
+  }
+
   async saveFile(path: string, file: Buffer) {
     return await this.fileManageStrategy.saveFile(path, file);
   }
