@@ -46,6 +46,14 @@ Scheduled Queue를 기반으로 작업을 처리합니다.
   }
   ```
 
+  환경 변수를 이용하여 AWS를 설정하는 경우 awsConfigPath를 'aws'로 설정
+  
+  |환경변수|설명|
+  |---|---|
+  |AWS_ACCESS_KEY_ID|aws credential access key id|
+  |AWS_SECRET_ACCESS_KEY|aws credential secret access key|
+  
+
 ## 3. Usage
 
 > npm start
