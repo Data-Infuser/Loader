@@ -3,8 +3,7 @@ import { Meta } from "../../../entity/manager/Meta";
 import { AcceptableType, MetaColumn } from "../../../entity/manager/MetaColumn";
 import MetaLoaderFileParam from "../interfaces/MetaLoaderFileParam";
 
-// const Excel = require("exceljs");
-import * as Excel from 'exceljs';
+const Excel = require("exceljs");
 import moment from "moment";
 import FileManager from '../../file-manager/FileManager';
 
@@ -72,7 +71,7 @@ class XlsxMetaLoadStrategy implements MetaLoadStrategy {
    * @param records n x m의 csv records
    * @returns AcceptableType[]
    */
-  checkTypesAndNullable(worksheet:Excel.Worksheet, skip: number):{ types: AcceptableType[], nullables: boolean[] }{
+  checkTypesAndNullable(worksheet, skip: number):{ types: AcceptableType[], nullables: boolean[] }{
     skip = skip + 1;
     let types
     let nullables;
