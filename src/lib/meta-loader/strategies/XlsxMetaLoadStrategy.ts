@@ -6,6 +6,7 @@ import MetaLoaderFileParam from "../interfaces/MetaLoaderFileParam";
 // const Excel = require("exceljs");
 import * as Excel from 'exceljs';
 import moment from "moment";
+import FileManager from '../../file-manager/FileManager';
 
 class XlsxMetaLoadStrategy implements MetaLoadStrategy {
   async loadMeta(info:MetaLoaderFileParam) {
@@ -25,7 +26,7 @@ class XlsxMetaLoadStrategy implements MetaLoadStrategy {
         
         const originalFileNameTokens = originalFileName.split(".");
         const ext = originalFileNameTokens[originalFileNameTokens.length - 1]
-        const loadedWorkbook = await new Excel.Workbook().xlsx.readFile(filePath);
+        const loadedWorkbook = await new Excel.Workbook().xlsx.read(FileManager.Instance.createReadStream(filePath));
         const worksheet = loadedWorkbook.worksheets[sheet]
         const totalRowCount = worksheet.rowCount
         const header = worksheet.getRow(skip + 1).values;
@@ -41,8 +42,6 @@ class XlsxMetaLoadStrategy implements MetaLoadStrategy {
         meta.samples = this.getSampleData(worksheet, skip);
 
         const { types, nullables } = this.checkTypesAndNullable(worksheet, skip);
-        console.log(types)
-        console.log(nullables)
         let columns = []
         for(let i = 1; i < header.length; i++) {
           const col = header[i];
