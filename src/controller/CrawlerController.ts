@@ -10,8 +10,19 @@ interface MetaLoaderJob {
     fileName: string
   }
 }
+
+/**
+ * SOS 데이터를 수집 기능을 담당하는 컨트롤러
+ */
 class CrawlerController {
 
+  /**
+   * 데이터를 수집하고 Data-Infuser 자료구조에 맞게 데이터를 생성하는 메소드<br>
+   * 기본 Meta 정보가 정상적으로 DB에 저장 된 경우 MedaLoad Job을 생성 후 MetaLoad Job Queue에 enqueue 함
+   * 
+   * @param job Job queue 작업
+   * @param done Callback
+   */
   static async start(job, done) {
     const crawler = new Crawler();
     const jobs = []

@@ -9,7 +9,16 @@ import { LoaderLog } from "../entity/manager/LoaderLog";
 import { Stage, StageStatus } from "../entity/manager/Stage";
 import { MetaStatus } from "../entity/manager/Meta";
 
+/**
+ * 데이터 적재를 담당하는 컨트롤러
+ */
 class DataLoaderController {
+  /**
+   * 데이터 적재를 하는 메소드
+   * 
+   * @param job Job queue 작업
+   * @param done Callback
+   */
   static async loadData(job, done) {
     const queryRunner = await getConnection().createQueryRunner();
     const stageRepo = getRepository(Stage);
@@ -95,6 +104,12 @@ class DataLoaderController {
     }
   }
 
+  /**
+   * 작업이 실패한 경우 실패 로그를 남기는 메소드
+   * 
+   * @param job 실패한 Job
+   * @param err job이 실패할 때 발생한 오류
+   */
   static async handleFailed(job, err) {
     try {
       const stageId = job.data.id;
@@ -117,6 +132,11 @@ class DataLoaderController {
     //await job.remove();
   }
 
+  /**
+   * 작업이 정상적으로 완료 된 로그를 남기는 메소드
+   * 
+   * @param job 성공한 작업
+   */
   static async handleCompleted(job) {
     try {
       const stageId = job.data.id;

@@ -11,7 +11,16 @@ import CubridMetaLoadStrategy from "../lib/meta-loader/strategies/CubridMetaLoad
 import MetaLoaderDbConnection from "../lib/meta-loader/interfaces/MetaLoaderDbConnection";
 import FileManager from '../lib/file-manager/FileManager';
 
+/**
+ * 메타 데이저 적재를 담당하는 컨트롤러
+ */
 class MetaLoaderController {
+  /**
+   * file-url 타입인 데이터의 경우 원천 데이터를 파일 저장소로 다운로드 받는 메소드
+   * 
+   * @param job Job queue 작업
+   * @param done Callback
+   */
   static async downloadFile(job, done) {
     try {
       job.progress(1);
@@ -71,6 +80,12 @@ class MetaLoaderController {
     }
   }
 
+  /**
+   * 상세 메타 정보를 적재하는 메소드
+   * 
+   * @param job Jobqueue 작업
+   * @param done Callback
+   */
   static async loadMeta(job, done) {
     try {
       const metaRepo = getRepository(Meta);
@@ -93,6 +108,14 @@ class MetaLoaderController {
     }
   }
 
+  /**
+   * 원천 데이터(DBMS // 파일 데이터)의 상세 메타를 분석하고 적재하는 메소드<br>
+   * 데이터 타입에 따라 분기하여 진행됨
+   * 
+   * @param meta 상세 메타를 분석할 Meta 객체
+   * 
+   * @returns 적재 결과
+   */
   static async loadMetaFromSource(meta: Meta): Promise<any> {
     const fileOption: MetaLoaderFileParam = {
       title: meta.title,
@@ -124,6 +147,13 @@ class MetaLoaderController {
     }
   }
 
+  /**
+   * DBMS 타입 데이터의 메타 분석을 진행하는 메소드
+   * 
+   * @param dbOption DB 연결 옵션
+   * 
+   * @returns loadResult
+   */
   static async loadMetaFromDbms(dbOption: MetaLoaderDbConnection): Promise<any> {
     return new Promise(async (resolve, reject) => {
       try {
@@ -149,6 +179,13 @@ class MetaLoaderController {
 
   }
 
+  /**
+   * File 타입 데이터의 메타 분석을 진행하는 메소드
+   * 
+   * @param fileParam 파일 정보
+   * 
+   * @returns loadResult
+   */
   static async loadMetaFromFile(fileParam: MetaLoaderFileParam): Promise<any> {
     return new Promise(async (resolve, reject) => {
       try {
