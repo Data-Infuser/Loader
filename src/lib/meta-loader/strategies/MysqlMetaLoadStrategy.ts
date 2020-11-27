@@ -8,6 +8,9 @@ import DbmsMetaLoadStrategy from "./DbmsMetaLoadStrategy";
 import DescTableResult from "../interfaces/DescTableResult";
 
 const mysqlTypes = require("../dbms_data_types/mysql.json");
+/**
+ * Mysql 데이터의 메타 데이터를 분석하고 적재하기 위한 Strategy 클래스
+ */
 class MysqlMetaLoadStrategy implements DbmsMetaLoadStrategy {
 
   typeConvertMap:{};
@@ -16,6 +19,11 @@ class MysqlMetaLoadStrategy implements DbmsMetaLoadStrategy {
     this.typeConvertMap = mysqlTypes;
   }
 
+  /**
+   * Mysql showtable 구현체
+   * 
+   * @param info db 접속 정보
+   */
   async showTables(info:MetaLoaderDbConnection):Promise<string[]> {
     return new Promise(async (resolve, reject) => {
       try {
@@ -51,6 +59,11 @@ class MysqlMetaLoadStrategy implements DbmsMetaLoadStrategy {
     })
   }
 
+  /**
+   * Mysql desctable 구현체
+   * 
+   * @param info db 접속 정보
+   */
   async descTable(info:MetaLoaderDbConnection):Promise<DescTableResult[]> {
     return new Promise(async (resolve, reject) => {
       try {
@@ -87,6 +100,11 @@ class MysqlMetaLoadStrategy implements DbmsMetaLoadStrategy {
     })
   }
   
+  /**
+   * cubrid load meta 구현체
+   * 
+   * @param info 파일 정보
+   */
   async loadMeta(info:MetaLoaderDbConnection) {
     return new Promise<MetaInfo>(async(resolve, reject) => {
       try {
@@ -159,7 +177,12 @@ class MysqlMetaLoadStrategy implements DbmsMetaLoadStrategy {
     });
   }
 
-
+  /**
+   * DB에 적재하기 위해 적합한 data type을 확인
+   * 
+   * @param records n x m의 records
+   * @returns {type: string, size: string}[]
+   */
   convertType(originType: string){
     const lowercaseType:string = originType.toLowerCase()
     const tokens = lowercaseType.split("(");
@@ -179,6 +202,11 @@ class MysqlMetaLoadStrategy implements DbmsMetaLoadStrategy {
     }
   }
 
+  /**
+   * 미리보기로 보여주기 위한 sample 데이터를 생성, 반환
+   * 
+   * @returns JSON string
+   */
   getSampleData(manager, tableNm): Promise<string> {
     return new Promise( async (resolve, reject) => {
       try {

@@ -9,6 +9,9 @@ import { MetaColumn } from "../../../entity/manager/MetaColumn";
 
 const mysqlTypes = require("../dbms_data_types/mysql.json");;
 
+/**
+ * Cubrid 데이터의 메타 데이터를 분석하고 적재하기 위한 Strategy 클래스
+ */
 class CubridMetaLoadStrategy implements DbmsMetaLoadStrategy {
 
   typeConvertMap:{};
@@ -17,14 +20,29 @@ class CubridMetaLoadStrategy implements DbmsMetaLoadStrategy {
     this.typeConvertMap = mysqlTypes;
   }
 
+  /**
+   * cubrid showtable 구현체
+   * 
+   * @param info db 접속 정보
+   */
   showTables(info: MetaLoaderDbConnection) {
     throw new Error("Method not implemented.");
   }
 
+  /**
+   * cubrid desctable 구현체
+   * 
+   * @param info db 접속 정보
+   */
   descTable(info: MetaLoaderDbConnection) {
     throw new Error("Method not implemented.");
   }
   
+  /**
+   * cubrid load meta 구현체
+   * 
+   * @param info 파일 정보
+   */
   async loadMeta(info:MetaLoaderDbConnection) {
     /**
      * Cubrid Query Result
@@ -106,7 +124,12 @@ class CubridMetaLoadStrategy implements DbmsMetaLoadStrategy {
     });
   }
 
-
+  /**
+   * DB에 적재하기 위해 적합한 data type을 확인
+   * 
+   * @param records n x m의 records
+   * @returns {type: string, size: string}[] 
+   */
   convertType(originType: string){
     const lowercaseType:string = originType.toLowerCase()
     const tokens = lowercaseType.split("(");

@@ -7,7 +7,15 @@ const Excel = require("exceljs");
 import moment from "moment";
 import FileManager from '../../file-manager/FileManager';
 
+/**
+ * Xlsx 파일의 메타 데이터를 분석하고 적재하기 위한 Strategy 클래스
+ */
 class XlsxMetaLoadStrategy implements MetaLoadStrategy {
+  /**
+   * Xlsx load meta 구현체
+   * 
+   * @param info 파일 정보
+   */
   async loadMeta(info:MetaLoaderFileParam) {
     return new Promise(async (resolve, reject) => {
       try{
@@ -67,9 +75,12 @@ class XlsxMetaLoadStrategy implements MetaLoadStrategy {
   }
 
   /**
+   * DB에 적재하기 위해 적합한 data type을 확인
    * 
-   * @param records n x m의 csv records
-   * @returns AcceptableType[]
+   * @param worksheet xlsx worksheet 객체
+   * @param skip 상단 skip 해야하는 row 수
+   * 
+   * @returns AcceptableType[], null 여부
    */
   checkTypesAndNullable(worksheet, skip: number):{ types: AcceptableType[], nullables: boolean[] }{
     skip = skip + 1;
@@ -124,7 +135,12 @@ class XlsxMetaLoadStrategy implements MetaLoadStrategy {
       nullables
     }
   }
-
+  /**
+   * cell value를 받아 null로 처리가 가능한 데이터인지 확인하고 반환하는 함수
+   * 
+   * @param value cell value
+   * @returns boolean
+   */
   isNull(value) {
     if (value === null) return true 
     if (typeof value === 'undefined') return true 
@@ -136,6 +152,7 @@ class XlsxMetaLoadStrategy implements MetaLoadStrategy {
 
   /**
    * string 값을 받아 Integer, Double, Date, Varchar 타입을 유추하는 함수
+   * 
    * @param string Csv 셀 내부의 value
    * @returns AcceptableType
    */
@@ -169,7 +186,12 @@ class XlsxMetaLoadStrategy implements MetaLoadStrategy {
   }
 
   /**
-   * 전체 Record를 받아 최대 5개의 sampleData를 JSON String으로 return
+   * 미리보기로 보여주기 위한 sample 데이터를 생성, 반환
+   * 
+   * @param worksheet xlsx worksheet 객체
+   * @param skip 상단 skip 해야하는 row 수
+   * 
+   * @returns JSON string
    */
   getSampleData(worksheet, skip) {
     const sampleDatas = [];

@@ -10,7 +10,15 @@ const parse = require('csv-parse/lib/sync')
 const iconv = require('iconv-lite');
 const jschardet = require('jschardet');
 
+/**
+ * CSV 파일의 메타 데이터를 분석하고 적재하기 위한 Strategy 클래스
+ */
 class CsvMetaLoadStrategy implements MetaLoadStrategy {
+  /**
+   * CSV load meta 구현체
+   * 
+   * @param info 파일 정보
+   */
   async loadMeta(info: MetaLoaderFileParam) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -105,6 +113,7 @@ class CsvMetaLoadStrategy implements MetaLoadStrategy {
   }
 
   /**
+   * DB에 적재하기 위해 적합한 data type을 확인
    * 
    * @param records n x m의 csv records
    * @returns AcceptableType[]
@@ -145,6 +154,7 @@ class CsvMetaLoadStrategy implements MetaLoadStrategy {
 
   /**
    * string 값을 받아 Integer, Double, Date, Varchar 타입을 유추하는 함수
+   * 
    * @param string Csv 셀 내부의 value
    * @returns AcceptableType
    */
@@ -170,6 +180,7 @@ class CsvMetaLoadStrategy implements MetaLoadStrategy {
 
   /**
    * 파라메터로 넘어온 Number 값이 정수인지 판별
+   * 
    * @param n 
    * @returns boolean
    */
@@ -178,7 +189,11 @@ class CsvMetaLoadStrategy implements MetaLoadStrategy {
   }
 
   /**
-   * 전체 Record를 받아 최대 5개의 sampleData를 JSON String으로 return
+   * 미리보기로 보여주기 위한 sample 데이터를 생성, 반환
+   * 
+   * @param records 전체 record
+   * 
+   * @returns JSON string
    */
   getSampleData(records) {
     let sampleDatas = []
