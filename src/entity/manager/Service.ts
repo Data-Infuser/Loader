@@ -13,6 +13,9 @@ export enum HttpMethod {
   DELETE = "delete"
 }
 
+/**
+ * Designer-Server Entity와 동일
+ */
 @Entity()
 export class Service {
 

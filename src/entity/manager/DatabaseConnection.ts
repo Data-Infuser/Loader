@@ -9,7 +9,9 @@ export enum AcceptableDbms {
   CUBRID = "cubrid"
 }
 
-
+/**
+ * Designer-Server Entity와 동일
+ */
 @Entity()
 export class DatabaseConnection {
   @PrimaryGeneratedColumn()

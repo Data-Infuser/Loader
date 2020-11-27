@@ -7,6 +7,9 @@ export enum TrafficConfigType {
   DAY = "day"
 }
 
+/**
+ * Designer-Server Entity와 동일
+ */
 @Entity()
 @Unique("traffic-config-unique", ["application", "type"])
 export class TrafficConfig {

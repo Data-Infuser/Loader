@@ -6,30 +6,60 @@ import { Stage } from '../../entity/manager/Stage';
 import { application } from 'express';
 
 /**
- * 논의사항
- * 1. 해당 파일 데이터의 API 호출 주소는 어떻게 설정을 해야 하는지? (API 명 등...)
- * 2. 해당 API 의 소유주는?
+ * 공공 데이터 포털에서 제공하는 파일데이터를 수집하기 위한 클래스
  */
 class Crawler {
+  /**
+   * 수집 할 page 번호
+   */
   private page: number = 1;
+  /**
+   * 한 페이지당 데이터의 개수<br>
+   * 2020.11.27 현재 최대 10000건까지 요청 가능한 것으로 확인됨
+   */
   private perPage: number = 50;
+  /**
+   * 전체 페이지 개수<br>
+   * Crawler가 동작하며 할당 됨
+   */
   private totalPage: number = 0;
+  /**
+   * public-data-pk 별 data 를 정리하기 위한 dict
+   */
   private pkDict: Map<string, Data[]> = new Map();
+  /**
+   * 다운로드가 실패한 Data 리스트
+   */
   private failList: Data[] = [];
 
+  /**
+   * 해당 API 소유자의 Data Infuser User ID
+   */
   private userId = 3;
 
+  /**
+   * 크롤러 생성자<br>
+   * perPage외 다른 프로퍼티는 공공 데이터 포털 API 를 사용하여 생성 됨
+   * 
+   * @param perPage 한 페이지에서 몇개의 데이터 개수
+   */
   constructor(perPage?: number) {
     if (perPage) { this.perPage = perPage }
   }
 
 
+  /**
+   * 데이터 수집을 시작하는 메소드
+   */
   public async start(): Promise<Application[]> {
     await this.makeDict();
     const applications = this.genApplications();
     return Promise.resolve(applications);
   }
 
+  /**
+   * public data pk를 이용하여 Dictionary 자료구조를 생성하는 메소드
+   */
   private async makeDict() {
     while (true) {
       const jsonData = await this.getNextData();
@@ -62,6 +92,9 @@ class Crawler {
     return Promise.resolve();
   }
 
+  /**
+   * 수집된 데이터를 사용하여 Data Infuser의 Entity 객체를 생성하는 메소드
+   */
   private genApplications() {
     const keys = this.pkDict.keys();
     const applications: Application[] = []
@@ -102,6 +135,9 @@ class Crawler {
     return applications;
   }
 
+  /**
+   * 다음 페이지의 데이터를 요청하는 메소드
+   */
   private async getNextData(): Promise<PortalResponse> {
     // 첫번쨰 페이지를 받아올 때 처리에 필요한 변수 저장
     if (this.page === 1) {

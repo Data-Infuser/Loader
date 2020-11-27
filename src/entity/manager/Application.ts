@@ -3,6 +3,9 @@ import { Length, IsNotEmpty, NotContains } from "class-validator";
 import { TrafficConfig } from "./TrafficConfig";
 import { Stage, StageStatus } from './Stage';
 
+/**
+ * Designer-Server Entity와 동일
+ */
 @Entity()
 @Unique("application_namespace_unique", ["nameSpace"])
 export class Application {

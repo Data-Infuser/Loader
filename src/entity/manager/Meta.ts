@@ -16,6 +16,9 @@ export enum MetaStatus {
   FAILED = "failed" 
 }
 
+/**
+ * Designer-Server Entity와 동일
+ */
 @Entity()
 export class Meta {
   @PrimaryGeneratedColumn()

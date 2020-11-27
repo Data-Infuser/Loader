@@ -13,7 +13,7 @@ export enum StageStatus {
 }
 
 /**
- * @tsoaModel
+ * Designer-Server Entity와 동일
  */
 @Entity()
 export class Stage {

@@ -12,6 +12,9 @@ export enum ParamOperatorType {
   NOT_EQUAT="neq"
 }
 
+/**
+ * Designer-Server Entity와 동일
+ */
 @Entity()
 export class MetaParam {
   @PrimaryGeneratedColumn()

@@ -16,6 +16,9 @@ export enum AcceptableType {
   LONGTEXT = "longtext",
   BOOLEAN = "boolean"
 }
+/**
+ * Designer-Server Entity와 동일
+ */
 @Entity()
 export class MetaColumn {
   @PrimaryGeneratedColumn()
