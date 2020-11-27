@@ -1,0 +1,348 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>api-data-loader</title>
+	<meta name="description" content="Documentation for api-data-loader">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">api-data-loader</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1>api-data-loader</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#loader" id="loader" style="color: inherit; text-decoration: none;">
+					<h1>Loader</h1>
+				</a>
+				<blockquote>
+					<p><code>Data Infuser</code> / Loader 프로젝트 입니다.</p>
+				</blockquote>
+				<p>Data Infuser 프로젝트에서 원천 데이터를 프로젝트 DB내에 로드하고, 원천 데이터의 Meta data를 읽는 모듈입니다.</p>
+				<p>Scheduled Queue를 기반으로 작업을 처리합니다.</p>
+				<a href="#1-environment" id="1-environment" style="color: inherit; text-decoration: none;">
+					<h2>1. Environment</h2>
+				</a>
+				<ul>
+					<li>nodeJS v12.16.3</li>
+					<li>MySQL 8.0.x</li>
+				</ul>
+				<a href="#2-installation" id="2-installation" style="color: inherit; text-decoration: none;">
+					<h2>2. Installation</h2>
+				</a>
+				<ul>
+					<li><p>ormconfig-sample.json을 복사하여 ormconfig.json 설정</p>
+					</li>
+					<li><p>property-sample.json을 복사하여 property.json 설정</p>
+					</li>
+					<li><p>typeorm global 설치</p>
+						<blockquote>
+							<p>npm install typeorm -g</p>
+						</blockquote>
+					</li>
+					<li><p>package 설치</p>
+						<blockquote>
+							<p>npm install</p>
+						</blockquote>
+						<a href="#file-system-설정" id="file-system-설정" style="color: inherit; text-decoration: none;">
+							<h3>File System 설정</h3>
+						</a>
+					</li>
+					<li><p>파일 저장은 S3 또는 local file system 두가지가 선택이 가능합니다.</p>
+						<table>
+							<thead>
+								<tr>
+									<th>타입</th>
+									<th>설명</th>
+								</tr>
+							</thead>
+							<tbody><tr>
+									<td>local</td>
+									<td>로컬 파일 시스템에 파일을 저장하는 경우 사용합니다. node js 기본 라이브러리인 fs를 사용합니다.</td>
+								</tr>
+								<tr>
+									<td>s3</td>
+									<td>AWS s3 또는 ncloud ObjStrg를 사용하는 경우 사용합니다. aws-sdk를 사용하여 파일 관리를 합니다.</td>
+								</tr>
+						</tbody></table>
+					</li>
+					<li><p>파일 저장소 사용시 설정 예시</p>
+						<pre><code><span class="hljs-string">&quot;uploadDist&quot;</span>: {
+<span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;local&quot;</span>,
+<span class="hljs-string">&quot;localPath&quot;</span>: <span class="hljs-string">&quot;/Users/chunghyup/projects/api-gen/api-designer/server/upload&quot;</span>,
+<span class="hljs-string">&quot;awsConfigPath&quot;</span>: <span class="hljs-string">&quot;&quot;</span>,
+<span class="hljs-string">&quot;s3Bucket&quot;</span>: <span class="hljs-string">&quot;&quot;</span>
+}</code></pre>
+					</li>
+					<li><p>S3 저장소 사용시 설정 예시</p>
+						<pre><code><span class="hljs-string">&quot;uploadDist&quot;</span>: {
+<span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;s3&quot;</span>,
+<span class="hljs-string">&quot;localPath&quot;</span>: <span class="hljs-string">&quot;&quot;</span>,
+<span class="hljs-string">&quot;awsConfigPath&quot;</span>: <span class="hljs-string">&quot;./src/config/aws-config.json&quot;</span>,
+<span class="hljs-string">&quot;s3Bucket&quot;</span>: <span class="hljs-string">&quot;data-infuser-test&quot;</span>
+}</code></pre>
+						<p>환경 변수를 이용하여 AWS를 설정하는 경우 awsConfigPath를 &#39;aws&#39;로 설정</p>
+						<table>
+							<thead>
+								<tr>
+									<th>환경변수</th>
+									<th>설명</th>
+								</tr>
+							</thead>
+							<tbody><tr>
+									<td>AWS_ACCESS_KEY_ID</td>
+									<td>aws credential access key id</td>
+								</tr>
+								<tr>
+									<td>AWS_SECRET_ACCESS_KEY</td>
+									<td>aws credential secret access key</td>
+								</tr>
+						</tbody></table>
+					</li>
+				</ul>
+				<a href="#3-usage" id="3-usage" style="color: inherit; text-decoration: none;">
+					<h2>3. Usage</h2>
+				</a>
+				<blockquote>
+					<p>npm start</p>
+				</blockquote>
+				<p>ts-node-dev를 이용하여 실행하기 때문에 코드 수정 후 저장을 하는 경우 자동으로 재시작됩니다.</p>
+				<a href="#4-deploy" id="4-deploy" style="color: inherit; text-decoration: none;">
+					<h2>4. DEPLOY</h2>
+				</a>
+				<blockquote>
+					<p>cp property-sample.json property-stage</p>
+				</blockquote>
+				<p>스테이지용 property 파일 생성 후 값 설정</p>
+				<blockquote>
+					<p>npm run deploy-stage</p>
+				</blockquote>
+				<ul>
+					<li>Stage 서버 접근 권한이 필요합니다.</li>
+				</ul>
+				<a href="#5-meta" id="5-meta" style="color: inherit; text-decoration: none;">
+					<h2>5. Meta</h2>
+				</a>
+				<p>Promptechnology - <a href="http://www.promptech.co.kr/">@Homepage</a> - <a href="dev@promptech.co.kr">dev@promptech.co.kr</a></p>
+				<p>프로젝트는 GPL 2.0 라이센스로 배포되었습니다. 자세한 사항은 <code>LICENSE</code> 파일을 확인해주세요.</p>
+				<p>Distributed under the GPL 2.0 license. See <code>LICENSE</code> for more information.</p>
+				<a href="#6-support" id="6-support" style="color: inherit; text-decoration: none;">
+					<h2>6. Support</h2>
+				</a>
+				<p><img src="http://wisepaip.org/assets/home/promptech-d8574a0910561aaea077bc759b1cf94c07baecc551f034ee9c7e830572d671de.png" alt="alt text" title="Title Text"></p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_app_.html">&quot;app&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_config_ormconfig_.html">&quot;config/orm<wbr>Config&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_config_propertyconfig_.html">&quot;config/property<wbr>Config&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_controller_crawlercontroller_.html">&quot;controller/<wbr>Crawler<wbr>Controller&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_controller_dataloadercontroller_.html">&quot;controller/<wbr>Data<wbr>Loader<wbr>Controller&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_controller_metaloadercontroller_.html">&quot;controller/<wbr>Meta<wbr>Loader<wbr>Controller&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_entity_manager_application_.html">&quot;entity/manager/<wbr>Application&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_entity_manager_databaseconnection_.html">&quot;entity/manager/<wbr>Database<wbr>Connection&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_entity_manager_loaderlog_.html">&quot;entity/manager/<wbr>Loader<wbr>Log&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_entity_manager_meta_.html">&quot;entity/manager/<wbr>Meta&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_entity_manager_metacolumn_.html">&quot;entity/manager/<wbr>Meta<wbr>Column&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_entity_manager_metaparam_.html">&quot;entity/manager/<wbr>Meta<wbr>Param&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_entity_manager_service_.html">&quot;entity/manager/<wbr>Service&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_entity_manager_stage_.html">&quot;entity/manager/<wbr>Stage&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_entity_manager_trafficconfig_.html">&quot;entity/manager/<wbr>Traffic<wbr>Config&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_index_.html">&quot;index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_bullmanager_.html">&quot;lib/<wbr>Bull<wbr>Manager&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_crawler_crawler_.html">&quot;lib/crawler/<wbr>Crawler&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_crawler_interface_portalresponse_.html">&quot;lib/crawler/interface/<wbr>Portal<wbr>Response&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_data_loader_dataloadstrategy_.html">&quot;lib/data-<wbr>loader/<wbr>Data<wbr>Load<wbr>Strategy&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_data_loader_dataloader_.html">&quot;lib/data-<wbr>loader/<wbr>Data<wbr>Loader&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_data_loader_strategies_csvstrategy_.html">&quot;lib/data-<wbr>loader/strategies/<wbr>Csv<wbr>Strategy&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_data_loader_strategies_cubridstrategy_.html">&quot;lib/data-<wbr>loader/strategies/<wbr>Cubrid<wbr>Strategy&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_data_loader_strategies_mysqlstrategy_.html">&quot;lib/data-<wbr>loader/strategies/<wbr>Mysql<wbr>Strategy&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_data_loader_strategies_xlsxstrategy_.html">&quot;lib/data-<wbr>loader/strategies/<wbr>Xlsx<wbr>Strategy&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_file_manager_filemanagestrategy_.html">&quot;lib/file-<wbr>manager/<wbr>File<wbr>Manage<wbr>Strategy&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_file_manager_filemanager_.html">&quot;lib/file-<wbr>manager/<wbr>File<wbr>Manager&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_file_manager_strategies_fsstrategy_.html">&quot;lib/file-<wbr>manager/strategies/<wbr>FsStrategy&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_file_manager_strategies_s3strategy_.html">&quot;lib/file-<wbr>manager/strategies/<wbr>S3Strategy&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_meta_loader_metaloadstrategy_.html">&quot;lib/meta-<wbr>loader/<wbr>Meta<wbr>Load<wbr>Strategy&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_meta_loader_metaloader_.html">&quot;lib/meta-<wbr>loader/<wbr>Meta<wbr>Loader&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_meta_loader_interfaces_desctableresult_.html">&quot;lib/meta-<wbr>loader/interfaces/<wbr>Desc<wbr>Table<wbr>Result&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_meta_loader_interfaces_metainfo_.html">&quot;lib/meta-<wbr>loader/interfaces/<wbr>Meta<wbr>Info&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_meta_loader_interfaces_metaloaderdbconnection_.html">&quot;lib/meta-<wbr>loader/interfaces/<wbr>Meta<wbr>Loader<wbr>DbConnection&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_meta_loader_interfaces_metaloaderfileparam_.html">&quot;lib/meta-<wbr>loader/interfaces/<wbr>Meta<wbr>Loader<wbr>File<wbr>Param&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_meta_loader_strategies_csvmetaloadstrategy_.html">&quot;lib/meta-<wbr>loader/strategies/<wbr>Csv<wbr>Meta<wbr>Load<wbr>Strategy&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_meta_loader_strategies_cubridmetaloadstrategy_.html">&quot;lib/meta-<wbr>loader/strategies/<wbr>Cubrid<wbr>Meta<wbr>Load<wbr>Strategy&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_meta_loader_strategies_dbmsmetaloadstrategy_.html">&quot;lib/meta-<wbr>loader/strategies/<wbr>Dbms<wbr>Meta<wbr>Load<wbr>Strategy&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_meta_loader_strategies_mysqlmetaloadstrategy_.html">&quot;lib/meta-<wbr>loader/strategies/<wbr>Mysql<wbr>Meta<wbr>Load<wbr>Strategy&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_meta_loader_strategies_xlsxmetaloadstrategy_.html">&quot;lib/meta-<wbr>loader/strategies/<wbr>Xlsx<wbr>Meta<wbr>Load<wbr>Strategy&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

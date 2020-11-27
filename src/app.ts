@@ -1,20 +1,20 @@
 import {createConnection} from "typeorm";
-import Bull, { JobOptions } from 'bull';
-import property from "../property.json"
+import Bull from 'bull';
 import propertyConfigs from "./config/propertyConfig"
 import ormConfig from "./config/ormConfig";
-import DataLoaderController from './controller/DataLoaderController';
-import MetaLoaderController from './controller/MetaLoaderController';
-import CrawlerController from './controller/CrawlerController';
+
 import BullManager from './lib/BullManager';
 
+/**
+ * Data Loader 클래스
+ */
 export class Loader {
-  dataLoaderQueue:Bull.Queue;
-  metaLoaderQueue: Bull.Queue;
-  crawlerQueue: Bull.Queue;
   
   constructor() {}
 
+  /**
+   * Loader에서 사용할 DB를 설정
+   */
   setupDbAndServer = async () => {
     const defaultConnection = {
       ...ormConfig.defaultConnection
