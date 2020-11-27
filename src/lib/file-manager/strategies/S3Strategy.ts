@@ -5,6 +5,9 @@ import { Readable } from 'typeorm/platform/PlatformTools';
 import * as stream from "stream";
 import FileManageStrategy from '../FileManageStrategy';
 
+/**
+ * S3 저장소에 파일을 관리하기 위한 Strategy
+ */
 export class S3Strategy implements FileManageStrategy {
   s3: AWS.S3
   bucket: string

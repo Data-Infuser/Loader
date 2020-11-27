@@ -3,6 +3,9 @@ import propertyConfigs from "../../../config/propertyConfig";
 import FileManageStrategy from "../FileManageStrategy";
 import { Readable } from 'typeorm/platform/PlatformTools';
 
+/**
+ * Server local 경로에 파일을 관리하기 위한 Strategy
+ */
 export class FsStrategy implements FileManageStrategy {
 
     createWriteStream = (path: string): { stream: WriteStream, path: string } => {
