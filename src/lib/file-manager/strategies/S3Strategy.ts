@@ -19,7 +19,7 @@ export class S3Strategy implements FileManageStrategy {
     this.s3 = new AWS.S3;
   }
 
-  saveFile = async (path:string, file: Buffer):Promise<string> => {
+  saveFile(path:string, file: Buffer):Promise<string> {
     return new Promise(async (resolve, reject) => {
       try {
         const objReq: PutObjectRequest = {
@@ -38,7 +38,7 @@ export class S3Strategy implements FileManageStrategy {
     })
   }
 
-  createReadStream = (path: string): Readable => {
+  createReadStream(path: string): Readable {
     const objReq: GetObjectRequest = {
       Bucket: this.bucket,
       Key: path
@@ -47,7 +47,7 @@ export class S3Strategy implements FileManageStrategy {
     return stream;
   }
 
-  createWriteStream = (path: string) : { stream: Readable, path: string } => {
+  createWriteStream(path: string) : { stream: Readable, path: string } {
     const Body = new stream.PassThrough();
 
     this.s3.upload({

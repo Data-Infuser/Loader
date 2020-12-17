@@ -8,18 +8,18 @@ import { Readable } from 'typeorm/platform/PlatformTools';
  */
 export class FsStrategy implements FileManageStrategy {
 
-    createWriteStream = (path: string): { stream: WriteStream, path: string } => {
+    createWriteStream(path: string): { stream: WriteStream, path: string } {
         return {
             stream: createWriteStream(propertyConfigs.uploadDist.localPath + "/" + path),
             path: propertyConfigs.uploadDist.localPath + "/" + path
         }
     }
 
-    createReadStream = (path: string) => {
+    createReadStream(path: string) {
         return createReadStream(path);
     }
 
-    saveFile = (path:string, file: Buffer) => {
+    saveFile(path:string, file: Buffer) {
         return;
     }
 }
