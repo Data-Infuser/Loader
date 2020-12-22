@@ -5,7 +5,7 @@ import CUBRID = require('node-cubrid');
 import DbmsMetaLoadStrategy from "./DbmsMetaLoadStrategy";
 import { MetaInfo } from "../interfaces/MetaInfo";
 import { Meta } from "../../../entity/manager/Meta";
-import { MetaColumn } from "../../../entity/manager/MetaColumn";
+import { AcceptableType, MetaColumn } from "../../../entity/manager/MetaColumn";
 
 const mysqlTypes = require("../dbms_data_types/mysql.json");;
 
@@ -97,15 +97,20 @@ class CubridMetaLoadStrategy implements DbmsMetaLoadStrategy {
 
         let columns = []
         for(let i = 0; i < describeResult.result.ColumnValues.length; i++) {
-          const info = describeResult.result.ColumnValues[i]
+          const info = describeResult.result.ColumnValues[i];
           const metaCol = new MetaColumn();
           metaCol.originalColumnName = info[0];
           metaCol.columnName = info[0];
           const convertedType = this.convertType(info[1]);
           metaCol.type = convertedType.type;
           if(convertedType.size) metaCol.size = `${convertedType.size}`;
+          if(Number.parseInt(metaCol.size) >= 1000) {
+            metaCol.size = null;
+            metaCol.type = AcceptableType.TEXT;
+          }
           metaCol.meta = meta;
           metaCol.order = i;
+
           columns.push(metaCol);
         }
 

@@ -2,7 +2,6 @@ import { MetaInfo } from "../interfaces/MetaInfo";
 import { createConnections, getManager, getConnection, ConnectionOptions } from "typeorm";
 import { Meta } from "../../../entity/manager/Meta";
 import { MetaColumn } from "../../../entity/manager/MetaColumn";
-import MetaLoadStrategy from "../MetaLoadStrategy";
 import MetaLoaderDbConnection from "../interfaces/MetaLoaderDbConnection";
 import DbmsMetaLoadStrategy from "./DbmsMetaLoadStrategy";
 import DescTableResult from "../interfaces/DescTableResult";
