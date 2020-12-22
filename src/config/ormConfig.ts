@@ -13,6 +13,7 @@ const  defaultConnection: ConnectionOptions = {
   username: process.env.DESIGNER_USERNAME || defaultConnectionInfo.username,
   password: process.env.DESIGNER_PASSWORD || defaultConnectionInfo.password,
   database: process.env.DESIGNER_DB_NAME || defaultConnectionInfo.database,
+  charset: "utf8mb4_unicode_ci",
   synchronize: false,
   logging: false,
   entities: [
@@ -39,6 +40,7 @@ const datasetConnection: ConnectionOptions =  {
   username: process.env.DESIGNER_DATASET_USERNAME || datasetConnectionInfo.username,
   password: process.env.DESIGNER_DATASET_PASSWORD || datasetConnectionInfo.password,
   database: process.env.DESIGNER_DATASET_DB_NAME || datasetConnectionInfo.database,
+  charset: "utf8mb4_unicode_ci",
   synchronize: false,
   logging: true,
   entities: [
