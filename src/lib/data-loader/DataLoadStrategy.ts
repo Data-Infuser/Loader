@@ -76,7 +76,7 @@ abstract class DataLoadStrategy {
         await datasetQueryRunner.query(insertQuery, [insertValues]);
         meta.status = MetaStatus.DATA_LOADED;
         await this.defaultQueryRunner.manager.save(meta);
-        resolve();
+        resolve({});
       } catch(err) {
         meta.status = MetaStatus.FAILED;
         await this.defaultQueryRunner.manager.save(meta);
@@ -92,7 +92,7 @@ abstract class DataLoadStrategy {
    * @param meta meta 객체
    * @param originalColumnNames DBMS인 경우 사용하는 원본 컬럼 명
    */
-  abstract async generateRows(meta:Meta, originalColumnNames:string[]);
+  abstract generateRows(meta:Meta, originalColumnNames:string[]);
 }
 
 export default DataLoadStrategy;
