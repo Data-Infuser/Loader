@@ -6,6 +6,7 @@ import { getConnection, Table } from 'typeorm';
 import { TableOptions } from 'typeorm/schema-builder/options/TableOptions';
 import { Stage } from '../../entity/manager/Stage';
 import { Column } from 'typeorm';
+import { debug } from 'console';
 
 /**
  * 데이터 유형별 데이터 적재를 위한 Strategy 클래스
@@ -40,7 +41,7 @@ abstract class DataLoadStrategy {
    */
   async load(stage: Stage, meta: Meta) {
     const datasetQueryRunner = await getConnection('dataset').createQueryRunner();
-    return new Promise<void>(async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
         const metaColumns = meta.columns;
         const tableName = `${stage.id}-${meta.service.id}`
@@ -52,7 +53,7 @@ abstract class DataLoadStrategy {
         metaColumns.sort(function(c1, c2) {
           return c1.order - c2.order;
         })
-        
+
         metaColumns.forEach(column => {
           columnNames.push(`\`${column.columnName}\``)
           originalColumnNames.push(`\`${column.originalColumnName}\``)
@@ -81,10 +82,13 @@ abstract class DataLoadStrategy {
         await datasetQueryRunner.query(insertQuery, [insertValues]);
         meta.status = MetaStatus.DATA_LOADED;
         await this.defaultQueryRunner.manager.save(meta);
+        await datasetQueryRunner.release()
         resolve({});
       } catch(err) {
+        debug(err);
         meta.status = MetaStatus.FAILED;
         await this.defaultQueryRunner.manager.save(meta);
+        await datasetQueryRunner.release()
         reject(err);
       }
     })
