@@ -40,7 +40,7 @@ const datasetConnection: ConnectionOptions =  {
   password: process.env.DESIGNER_DATASET_PASSWORD || datasetConnectionInfo.password,
   database: process.env.DESIGNER_DATASET_DB_NAME || datasetConnectionInfo.database,
   synchronize: false,
-  logging: true,
+  logging: false,
   entities: [
     "src/entity/dataset/*.ts"
   ]

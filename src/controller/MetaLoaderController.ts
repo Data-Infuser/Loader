@@ -10,6 +10,9 @@ import MysqlMetaLoadStrategy from "../lib/meta-loader/strategies/MysqlMetaLoadSt
 import CubridMetaLoadStrategy from "../lib/meta-loader/strategies/CubridMetaLoadStrategy";
 import MetaLoaderDbConnection from "../lib/meta-loader/interfaces/MetaLoaderDbConnection";
 import FileManager from '../lib/file-manager/FileManager';
+import { Stage, StageStatus } from "../entity/manager/Stage";
+import BullManager from '../lib/BullManager';
+import { debug } from "console";
 
 /**
  * 메타 데이저 적재를 담당하는 컨트롤러
@@ -87,10 +90,16 @@ class MetaLoaderController {
    * @param done Callback
    */
   static async loadMeta(job, done) {
+    debug("metaloader controller > start")
     try {
       const metaRepo = getRepository(Meta);
       const metaId = job.data.metaId;
-      const meta = await metaRepo.findOne(metaId);
+      const meta = await metaRepo.findOne({
+        relations: ["stage"],
+        where: {
+          id: metaId
+        }
+      });
       let loaderResult = await this.loadMetaFromSource(meta);;
 
       const loadedMeta: Meta = loaderResult.meta;
@@ -98,14 +107,40 @@ class MetaLoaderController {
       loadedMeta.dataType = meta.dataType;
       loadedMeta.remoteFilePath = meta.remoteFilePath;
       loadedMeta.id = meta.id;
+      loadedMeta.status = MetaStatus.METALOADED;
       await getManager().transaction("SERIALIZABLE", async transactionalEntityManager => {
         await transactionalEntityManager.save(loadedMeta);
         await transactionalEntityManager.save(columns);
       });
+
+      if(job.data.loadData) {
+        // loadData가 있는 경우 문제가 없다면 바로 데이터를 적재
+        const stageRepo = getRepository(Stage);
+        const stage = await stageRepo.findOneOrFail({
+          relations: ["metas", "application"],
+          where: {
+            id: meta.stage.id
+          }
+        })
+        stage.status = StageStatus.SCHEDULED;
+        stage.metas.forEach( meta => {
+          meta.status = MetaStatus.DATA_LOAD_SCHEDULED;
+        })
+        await getManager().transaction("SERIALIZABLE", async transactionalEntityManager => {
+          await transactionalEntityManager.save(stage);
+          await transactionalEntityManager.save(stage.metas);
+        });
+        BullManager.Instance.dataLoaderQueue.add({
+          id: stage.id,
+          userId: stage.application.userId
+        })
+        debug("meta loader controller > add data loader done")
+      }
       done();
     } catch (err) {
       done(err);
     }
+    debug("metaloader controller > end")
   }
 
   /**

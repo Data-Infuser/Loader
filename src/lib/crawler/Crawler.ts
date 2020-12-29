@@ -154,7 +154,7 @@ class Crawler {
     }
     if (this.page % 1 === 0) { console.log(`current page ${this.page}`) }
     this.page++;
-    const response = await Axios.get(`https://www.data.go.kr/api/dataset/csvFileData.do?key=ptech-VfP6vI90Xr&page=${this.page}&per_page=${this.perPage}&orderBy=true`)
+    const response = await Axios.get(`https://www.data.go.kr/api/dataset/csvFileData.do?key=ptech-VfP6vI90Xr&page=${this.page}&per_page=${this.perPage}`)
     const jsonData = response.data;
     return Promise.resolve(jsonData);
   }

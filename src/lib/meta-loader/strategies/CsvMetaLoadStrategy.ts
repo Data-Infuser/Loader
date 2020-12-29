@@ -5,6 +5,7 @@ import MetaLoaderFileParam from "../interfaces/MetaLoaderFileParam";
 import fs from 'fs';
 import moment from 'moment';
 import FileManager from '../../file-manager/FileManager';
+import { Length } from 'class-validator';
 
 const parse = require('csv-parse/lib/sync')
 const iconv = require('iconv-lite');
@@ -161,16 +162,16 @@ class CsvMetaLoadStrategy implements MetaLoadStrategy {
   availableType(string) {
     try {
       const tempNumn = Number(string);
-      if (!isNaN(tempNumn)) {
+      if (!isNaN(tempNumn) && string.length !== 0) {
         /**
          * 숫자 타입인 경우 INTEGER와 DOUBLE 중 선택
          */
         return this.isInt(tempNumn) ? AcceptableType.INTEGER : AcceptableType.DOUBLE
       }
 
-      if (moment(string, null, true).isValid()) {
-        return AcceptableType.DATE;
-      }
+      // if (moment(string, null, true).isValid()) {
+      //   return AcceptableType.DATE;
+      // }
 
       return AcceptableType.VARCHAR;
     } catch (err) {

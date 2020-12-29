@@ -8,6 +8,7 @@ import DataLoader from "../lib/data-loader/DataLoader";
 import { LoaderLog } from "../entity/manager/LoaderLog";
 import { Stage, StageStatus } from "../entity/manager/Stage";
 import { MetaStatus } from "../entity/manager/Meta";
+import { debug } from "console";
 
 /**
  * 데이터 적재를 담당하는 컨트롤러
@@ -20,6 +21,7 @@ class DataLoaderController {
    * @param done Callback
    */
   static async loadData(job, done) {
+    debug("DataLoader controller > start")
     const queryRunner = await getConnection().createQueryRunner();
     const stageRepo = getRepository(Stage);
     let stage:Stage;
@@ -102,6 +104,7 @@ class DataLoaderController {
     } finally {
       await queryRunner.release();
     }
+    debug("DataLoader controller > end")
   }
 
   /**

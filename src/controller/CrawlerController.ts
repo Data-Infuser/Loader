@@ -2,12 +2,14 @@
 import { getConnection, getManager } from 'typeorm';
 import Crawler from '../lib/crawler/Crawler';
 import BullManager from '../lib/BullManager';
+import { debug } from 'console';
 
 interface MetaLoaderJob {
   data: {
     metaId: number,
     url: string,
-    fileName: string
+    fileName: string,
+    loadData: boolean
   }
 }
 
@@ -24,6 +26,7 @@ class CrawlerController {
    * @param done Callback
    */
   static async start(job, done) {
+    debug("crawler controller > start")
     const crawler = new Crawler();
     const jobs = []
     const queryRunner = await getConnection().createQueryRunner();
@@ -47,7 +50,8 @@ class CrawlerController {
               data: {
                 metaId: meta.id,
                 url: meta.remoteFilePath,
-                fileName: `${application.userId}-${meta.id}-${Date.now()}.${meta.extension}`
+                fileName: `${application.userId}-${meta.id}-${Date.now()}.${meta.extension}`,
+                loadData: true
               }
             }
             jobs.push(job);
@@ -64,6 +68,7 @@ class CrawlerController {
       await queryRunner.release();
     }
     done();
+    debug("crawler controller > end")
   }
 
 }

@@ -99,7 +99,7 @@ export default class BullManager {
 
     //download
     this.downloadQueue.process((job, done) => MetaLoaderController.downloadFile(job, done));
-    this.downloadQueue.on('completed', (job) =>{ this.metaLoaderQueue.add({metaId: job.data.metaId})});
+    this.downloadQueue.on('completed', (job) =>{ this.metaLoaderQueue.add({metaId: job.data.metaId, loadData: job.data.loadData})});
 
     const jobOption:JobOptions = {
       repeat: {
@@ -114,7 +114,7 @@ export default class BullManager {
       }
     }
     // await this.crawlerQueue.add({}, jobOption)
-    //await this.crawlerQueue.add({}, jobRepoeatOption)
+    // await this.crawlerQueue.add({}, jobRepoeatOption)
 
     this.crawlerQueue.process((job, done) => CrawlerController.start(job, done));
   }
