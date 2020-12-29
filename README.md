@@ -25,6 +25,7 @@ Scheduled Queue를 기반으로 작업을 처리합니다.
   |-----|------|
   |local|로컬 파일 시스템에 파일을 저장하는 경우 사용합니다. node js 기본 라이브러리인 fs를 사용합니다.|
   |s3|AWS s3 또는 ncloud ObjStrg를 사용하는 경우 사용합니다. aws-sdk를 사용하여 파일 관리를 합니다.|
+  |ncloud|설정 방법은 S3와 동일. ncloud로 설정하는 경우 Ncloud 공공존 Object storage를 사용하도록 설정 합니다.|
 
   * 파일 저장소 사용시 설정 예시
   ```
