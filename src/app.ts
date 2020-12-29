@@ -22,11 +22,6 @@ export class Loader {
     const datasetConnection = {
       ...ormConfig.datasetConnection
     }
-    let redisHost = propertyConfigs.jobqueueRedis.host
-    if(process.env.NODE_ENV !== 'production') {
-      redisHost = "localhost"
-      defaultConnection.database ="designer-test"
-    }
 
     try {
       await createConnection(defaultConnection);

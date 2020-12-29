@@ -114,8 +114,8 @@ export default class BullManager {
       }
     }
     // await this.crawlerQueue.add({}, jobOption)
-    // await this.crawlerQueue.add({}, jobRepoeatOption)
+    //await this.crawlerQueue.add({}, jobRepoeatOption)
 
-    // this.crawlerQueue.process((job, done) => CrawlerController.start(job, done));
+    this.crawlerQueue.process((job, done) => CrawlerController.start(job, done));
   }
 }

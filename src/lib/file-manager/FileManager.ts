@@ -52,8 +52,8 @@ class FileManager {
     if(options.awsConfigPath) { this.awsConfigPath = options.awsConfigPath; }
     if(options.localPath) { this.localPath = options.localPath; }
 
-    if(this.type === 's3') {
-      this.fileManageStrategy = new S3Strategy(this.awsConfigPath, options.s3Bucket);
+    if(this.type === 's3' || this.type === 'ncloud') {
+      this.fileManageStrategy = new S3Strategy(this.awsConfigPath, options.s3Bucket, this.type);
     }
     else if(this.type === 'local') {
       this.fileManageStrategy = new FsStrategy();

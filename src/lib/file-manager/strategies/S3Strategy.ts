@@ -11,12 +11,22 @@ import FileManageStrategy from '../FileManageStrategy';
 export class S3Strategy implements FileManageStrategy {
   s3: AWS.S3
   bucket: string
-  constructor(configPath: string, bucket: string) {
+  constructor(configPath: string, bucket: string, type: string) {
     if (configPath !== 'env') {
       AWS.config.loadFromPath(configPath);
     }
     this.bucket = bucket;
-    this.s3 = new AWS.S3;
+
+
+    if (type === 'ncloud') {
+      // ncloud 공공존인 경우 추가 설정이 필요
+      this.s3 = new AWS.S3({
+        endpoint: 'https://kr.object.gov-ncloudstorage.com'
+      });
+    } else {
+      this.s3 = new AWS.S3();
+    }
+    
   }
 
   saveFile(path:string, file: Buffer):Promise<string> {

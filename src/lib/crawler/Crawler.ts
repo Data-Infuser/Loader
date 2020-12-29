@@ -4,6 +4,7 @@ import { Application } from '../../entity/manager/Application';
 import { Meta, MetaStatus } from '../../entity/manager/Meta';
 import { Stage } from '../../entity/manager/Stage';
 import { application } from 'express';
+import { Service } from '../../entity/manager/Service';
 
 /**
  * 공공 데이터 포털에서 제공하는 파일데이터를 수집하기 위한 클래스
@@ -30,7 +31,7 @@ class Crawler {
   /**
    * 다운로드가 실패한 Data 리스트
    */
-  private failList: Data[] = [];
+  failList: Data[] = [];
 
   /**
    * 해당 API 소유자의 Data Infuser User ID
@@ -114,7 +115,7 @@ class Crawler {
       application.userId = this.userId;
       application.nameSpace = dataForApplication.public_data_pk;
       const stage = new Stage();
-      stage.name = "1";
+      stage.name = `${application.lastVersion}`;
       stage.userId = this.userId;
       stage.metas = [];
       application.stages = [stage];
@@ -127,7 +128,14 @@ class Crawler {
         newMeta.extension = "csv";
         newMeta.title = data.data_nm;
         newMeta.status = MetaStatus.DOWNLOAD_SCHEDULED;
+        newMeta.userId = this.userId;
         application.stages[0].metas.push(newMeta);
+        
+        const newService = new Service();
+        newService.entityName = data.public_data_detail_pk;
+        newService.description = data.public_data_detail_pk;
+        newService.userId = this.userId;
+        newMeta.service = newService;
       }
       applications.push(application);
     }
@@ -146,7 +154,7 @@ class Crawler {
     }
     if (this.page % 1 === 0) { console.log(`current page ${this.page}`) }
     this.page++;
-    const response = await Axios.get(`https://www.data.go.kr/api/dataset/csvFileData.do?key=ptech-VfP6vI90Xr&page=${this.page}&per_page=${this.perPage}`)
+    const response = await Axios.get(`https://www.data.go.kr/api/dataset/csvFileData.do?key=ptech-VfP6vI90Xr&page=${this.page}&per_page=${this.perPage}&orderBy=true`)
     const jsonData = response.data;
     return Promise.resolve(jsonData);
   }

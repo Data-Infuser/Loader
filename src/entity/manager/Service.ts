@@ -29,12 +29,19 @@ export class Service {
   })
   method: string;
 
+  /**
+   * 해당 api endpoint를 표현하기 위한 제목
+   */
+  @Column({
+    default: ""
+  })
+  title: string;
+
   @Column({type: "text"})
   description: string;
 
   @Column()
   @Length(1, 100)
-  @NotContains("-")
   entityName: string; //TODO: 생성시 unique 처리 필요.
 
   @Column()
@@ -43,6 +50,9 @@ export class Service {
   @OneToOne(type => Meta, meta => meta.service, {nullable: true, onDelete: "SET NULL"})
   @JoinColumn()
   meta: Meta;
+
+  @Column()
+  metaId: number;
 
   @Column()
   @CreateDateColumn()

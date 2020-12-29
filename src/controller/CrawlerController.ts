@@ -37,6 +37,11 @@ class CrawlerController {
         for(let stage of application.stages) {
           stage.metas.map(el => { el.stageId = stage.id })
           await queryRunner.manager.save(stage.metas);
+          const service = stage.metas.map(el => { 
+            el.service.meta = el
+            return el.service;
+          })
+          await queryRunner.manager.save(service);
           for(let meta of stage.metas) {
             const job: MetaLoaderJob = {
               data: {

@@ -7,7 +7,7 @@ const defaultConnectionInfo = ormConfigJson[0];
 const datasetConnectionInfo = ormConfigJson[1];
 
 const  defaultConnection: ConnectionOptions = {
-  type: "mariadb",
+  type: process.env.DESIGNER_TYPE || defaultConnectionInfo.type,
   host: process.env.DESIGNER_HOSTNAME || defaultConnectionInfo.host,
   port: Number(process.env.DESIGNER_PORT) || defaultConnectionInfo.port,
   username: process.env.DESIGNER_USERNAME || defaultConnectionInfo.username,
@@ -32,7 +32,7 @@ const  defaultConnection: ConnectionOptions = {
 }
 
 const datasetConnection: ConnectionOptions =  {
-  type: "mariadb",
+  type: process.env.DESIGNER_DATASET_TYPE || datasetConnectionInfo.type,
   name: "dataset",
   host: process.env.DESIGNER_DATASET_HOSTNAME || datasetConnectionInfo.host,
   port: Number(process.env.DESIGNER_DATASET_PORT) || datasetConnectionInfo.port,
