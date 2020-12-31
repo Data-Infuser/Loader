@@ -18,7 +18,7 @@ class Crawler {
    * 한 페이지당 데이터의 개수<br>
    * 2020.11.27 현재 최대 10000건까지 요청 가능한 것으로 확인됨
    */
-  private perPage: number = 50;
+  private perPage: number = 10000;
   /**
    * 전체 페이지 개수<br>
    * Crawler가 동작하며 할당 됨
@@ -55,6 +55,7 @@ class Crawler {
   public async start(): Promise<Application[]> {
     await this.makeDict();
     const applications = this.genApplications();
+    console.log(applications.length)
     return Promise.resolve(applications);
   }
 
@@ -66,8 +67,15 @@ class Crawler {
       const jsonData = await this.getNextData();
 
       for(let el of jsonData.data) {
+        /**
+         * 파일 사이즈가 없거나, 10000(10mb) 이상인 경우
+         */
+        if(el.file_size === null) {
+          this.failList.push(el);
+          continue;
+        }
         // file_nm 이 없는 경우 pass
-        if(!el.file_nm || el.download_url.trim().length === 0) {
+        if(el.download_url === null || el.file_nm === null || !el.file_nm || el.download_url.trim().length === 0) {
           this.failList.push(el);
           continue;
         }
@@ -148,14 +156,13 @@ class Crawler {
    */
   private async getNextData(): Promise<PortalResponse> {
     // 첫번쨰 페이지를 받아올 때 처리에 필요한 변수 저장
-    if (this.page === 1) {
-      // this.totalPage = sampleData.page.totalPage;
-      this.totalPage = 1;
-    }
     if (this.page % 1 === 0) { console.log(`current page ${this.page}`) }
-    this.page++;
-    const response = await Axios.get(`https://www.data.go.kr/api/dataset/csvFileData.do?key=ptech-VfP6vI90Xr&page=${this.page}&per_page=${this.perPage}`)
+    const response = await Axios.get(`https://www.data.go.kr/api/dataset/csvFileData.do?key=ptech-VfP6vI90Xr&page=${this.page}&per_page=${this.perPage}&ordetBy=true`)
     const jsonData = response.data;
+    if (this.page === 1) {
+      this.totalPage = jsonData.page.totalPage;
+    }
+    this.page++;
     return Promise.resolve(jsonData);
   }
 }

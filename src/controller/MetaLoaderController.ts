@@ -18,6 +18,12 @@ import { debug } from "console";
  * 메타 데이저 적재를 담당하는 컨트롤러
  */
 class MetaLoaderController {
+
+  static delayedDownload(job, done) {
+    setTimeout(function() {
+      MetaLoaderController.downloadFile(job, done);
+    }, 700);
+  }
   /**
    * file-url 타입인 데이터의 경우 원천 데이터를 파일 저장소로 다운로드 받는 메소드
    * 

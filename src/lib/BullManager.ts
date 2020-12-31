@@ -98,7 +98,7 @@ export default class BullManager {
     this.metaLoaderQueue.process((job, done) => MetaLoaderController.loadMeta(job, done));
 
     //download
-    this.downloadQueue.process((job, done) => MetaLoaderController.downloadFile(job, done));
+    this.downloadQueue.process((job, done) => MetaLoaderController.delayedDownload(job, done));
     this.downloadQueue.on('completed', (job) =>{ this.metaLoaderQueue.add({metaId: job.data.metaId, loadData: job.data.loadData})});
 
     const jobOption:JobOptions = {

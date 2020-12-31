@@ -230,5 +230,10 @@ export interface Data {
     /**
      * 파일명
      */
-    file_nm: string
+    file_nm: string,
+
+    /**
+     * 파일 사이즈(kb)
+     */
+    file_size: number
 }
