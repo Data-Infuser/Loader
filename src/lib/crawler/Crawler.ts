@@ -70,7 +70,7 @@ class Crawler {
         /**
          * 파일 사이즈가 없거나, 10000(10mb) 이상인 경우
          */
-        if(el.file_size === null) {
+        if(el.file_size === null || el.file_size >= 10000) {
           this.failList.push(el);
           continue;
         }
