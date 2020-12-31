@@ -58,7 +58,7 @@ class CrawlerController {
           }
         }
       }
-      //BullManager.Instance.downloadQueue.addBulk(jobs);
+      BullManager.Instance.downloadQueue.addBulk(jobs);
       await queryRunner.commitTransaction();
     } catch(err) {
       try{
