@@ -128,19 +128,23 @@ class MetaLoaderController {
             id: meta.stage.id
           }
         })
-        stage.status = StageStatus.SCHEDULED;
-        stage.metas.forEach( meta => {
-          meta.status = MetaStatus.DATA_LOAD_SCHEDULED;
-        })
-        await getManager().transaction("SERIALIZABLE", async transactionalEntityManager => {
-          await transactionalEntityManager.save(stage);
-          await transactionalEntityManager.save(stage.metas);
-        });
-        BullManager.Instance.dataLoaderQueue.add({
-          id: stage.id,
-          userId: stage.application.userId
-        })
-        debug("meta loader controller > add data loader done")
+
+        if(stage.metas.every(el => el.status === MetaStatus.METALOADED)) {
+          stage.status = StageStatus.SCHEDULED;
+          stage.metas.forEach( meta => {
+            meta.status = MetaStatus.DATA_LOAD_SCHEDULED;
+          })
+          await getManager().transaction("SERIALIZABLE", async transactionalEntityManager => {
+            await transactionalEntityManager.save(stage);
+            await transactionalEntityManager.save(stage.metas);
+          });
+          
+          BullManager.Instance.dataLoaderQueue.add({
+            id: stage.id,
+            userId: stage.application.userId
+          })
+          debug("meta loader controller > add data loader done")
+        }
       }
       done();
     } catch (err) {
