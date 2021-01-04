@@ -29,9 +29,9 @@ class CsvStrategy extends DataLoadStrategy {
       try {
         //const fileStream = fs.createReadStream(meta.filePath); 
         const fileStream = FileManager.Instance.createReadStream(meta.filePath); // 파일매니저를 통해서 스트림 받게 변경
-        
+        const iconvStream = iconv.decodeStream(meta.encoding)
         const rl = readline.createInterface({
-          input: fileStream.pipe(iconv.decodeStream(meta.encoding))
+          input: fileStream.pipe(iconvStream)
         })
         
         let chunks = []
@@ -56,9 +56,13 @@ class CsvStrategy extends DataLoadStrategy {
           rl.resume();
         })
         .on('close', () => {
-          const csvString = chunks.join('\n');
-          const records = parse(csvString);
-          resolve(records);
+          try {
+            const csvString = chunks.join('\n');
+            const records = parse(csvString);
+            resolve(records);
+          } catch(err) {
+            reject(err);
+          }
         })
 
       } catch (err) {
