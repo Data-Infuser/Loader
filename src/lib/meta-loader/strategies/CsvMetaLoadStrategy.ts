@@ -138,18 +138,18 @@ class CsvMetaLoadStrategy implements MetaLoadStrategy {
       }
 
       for (let j = 0; j < records[i].length; j++) {
-
+         //typecheck 도중 type이 변경 될 수 있기 때문에 type에 관계없이 maxlength는 항상 update 필요
+        const currentLength = records[i][j].length;
+        if(lengths[j] < currentLength) {
+          lengths[j] = currentLength
+        }
         //type이 varchar인 경우 Type을 확인하지 않고 다음 loop로 진행
         if (types[j] === AcceptableType.VARCHAR) continue;
 
         //기존 Type과 새로 판별한 Type이 다른 경우 Varchar로 변경
         //단 INTEGER의 경우 DOUBLE로 처리하는 것은 가능해야함
         const availableType = this.availableType(records[i][j]);
-        const currentLength = records[i][j].length;
-        //typecheck 도중 type이 변경 될 수 있기 때문에 type에 관계없이 maxlength는 항상 update 필요
-        if(lengths[j] < currentLength) {
-          lengths[j] = currentLength
-        }
+        
         if (availableType !== types[j]) {
           if ((availableType === AcceptableType.DOUBLE && types[j] === AcceptableType.INTEGER) || (availableType === AcceptableType.INTEGER && types[j] === AcceptableType.DOUBLE)) {
             types[j] = AcceptableType.DOUBLE
