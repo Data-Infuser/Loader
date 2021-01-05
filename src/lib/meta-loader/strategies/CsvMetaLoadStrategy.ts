@@ -82,11 +82,16 @@ class CsvMetaLoadStrategy implements MetaLoadStrategy {
               meta.encoding = encoding;
               meta.samples = this.getSampleData(records);
 
-              const types = this.checkTypes(records, meta.skip);
+              const { types, lengths } = this.checkTypes(records, meta.skip);
 
               let columns = []
               for (let i = 0; i < header.length; i++) {
                 const col:string = header[i].trim();
+                // header에서 col length가 0인 경우 대부분 row 마지막에 ,가 있는 경우임. 예외 처리 필요
+                // 중간에 column명이 없는 경우 Data 오류로 Fail
+                if(col.length === 0 && i === header.length - 1) {
+                  continue;
+                }
                 const metaCol = new MetaColumn();
                 metaCol.originalColumnName = col;
                 metaCol.columnName = col;
@@ -119,13 +124,15 @@ class CsvMetaLoadStrategy implements MetaLoadStrategy {
    * @param records n x m의 csv records
    * @returns AcceptableType[]
    */
-  checkTypes(records: string[][], skip: number): AcceptableType[] {
+  checkTypes(records: string[][], skip: number): {types: AcceptableType[], lengths: number[]} {
     skip = skip + 1;
-    const types = []
+    const types = [];
+    const lengths = [];
     for (let i = skip; i < records.length; i++) {
       if (i === skip) {
         for (let record of records[i]) {
           types.push(this.availableType(record))
+          lengths.push(record.length)
         }
         continue;
       }
@@ -138,19 +145,31 @@ class CsvMetaLoadStrategy implements MetaLoadStrategy {
         //기존 Type과 새로 판별한 Type이 다른 경우 Varchar로 변경
         //단 INTEGER의 경우 DOUBLE로 처리하는 것은 가능해야함
         const availableType = this.availableType(records[i][j]);
+        const currentLength = records[i][j].length;
+        //typecheck 도중 type이 변경 될 수 있기 때문에 type에 관계없이 maxlength는 항상 update 필요
+        if(lengths[j] < currentLength) {
+          lengths[j] = currentLength
+        }
         if (availableType !== types[j]) {
           if ((availableType === AcceptableType.DOUBLE && types[j] === AcceptableType.INTEGER) || (availableType === AcceptableType.INTEGER && types[j] === AcceptableType.DOUBLE)) {
             types[j] = AcceptableType.DOUBLE
           } else {
             types[j] = AcceptableType.VARCHAR;
           }
-        }
+        }        
       }
 
       //전체 타입이 varchar로 유츄되는 경우 더이상 Type을 확인하지 않고 break;
       if (types.every(type => type === AcceptableType.VARCHAR)) break;
     }
-    return types;
+    
+    // 전체 length를 확인하며 length가 너무 큰 경우 TEXT 타입으로 변경
+    for(let i = 0; i < lengths.length; i++ ) {
+      if(lengths[i] > 255) {
+        types[i] = AcceptableType.TEXT
+      }
+    }
+    return { types, lengths };
   }
 
   /**
@@ -162,7 +181,7 @@ class CsvMetaLoadStrategy implements MetaLoadStrategy {
   availableType(string) {
     try {
       const tempNumn = Number(string);
-      if (!isNaN(tempNumn) && string.length !== 0) {
+      if (!isNaN(tempNumn) && string.trim().length !== 0) {
         /**
          * 숫자 타입인 경우 INTEGER와 DOUBLE 중 선택
          */
@@ -204,6 +223,7 @@ class CsvMetaLoadStrategy implements MetaLoadStrategy {
     }
     return JSON.stringify({ items: sampleDatas });
   }
+  
 }
 
 export default CsvMetaLoadStrategy;

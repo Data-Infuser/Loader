@@ -76,6 +76,18 @@ abstract class DataLoadStrategy {
         let insertQuery = `INSERT INTO \`${tableOption.name}\`(${columnNames.join(",")}) VALUES ?`;
 
         let insertValues = await this.generateRows(meta, originalColumnNames);
+
+        // Row 마지막에 ,이 있어 빈 데이터가 생성되는 경우를 추가로 처리해야함.
+        for(let i = 0; i < insertValues.length; i++) {
+          let currentRow:string[] = insertValues[i]
+          // + 1이 아닌 경우는 Data가 잘못 된 경우 && 마지막 value의 trim length 가 0인 경우
+          if(currentRow.length === metaColumns.length + 1 && currentRow[currentRow.length - 1].trim().length === 0) {
+            insertValues[i].pop();
+          } else if(currentRow.length !== metaColumns.length) {
+            reject(new Error("Row length and Meta Colum length are not Same!!!"));
+            return;
+          }
+        }
         this.tablesForDelete.push(tableOption.name);
         await datasetQueryRunner.dropTable(tableName, true);
         await datasetQueryRunner.createTable(new Table(tableOption));
